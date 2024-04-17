@@ -4,27 +4,28 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+
 
 @Entity
-@Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WishList extends BaseEntity{
-
+@Builder
+public class Product extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="wishlist_id")
-    private Long wishlistId;
-
-    @Column(name="user_id")
-    private Long userId;
-
     @Column(name="product_id")
     private Long productId;
 
+    @Column(name = "name")
+    private String name;
 
+    @Column(name = "stock")
+    private int stock;
+
+    @Column(name = "price")
+    private long price;
+
+    @Column(name = "description")
+    private String description;
 
 }
