@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name="wishlist")
 public class WishList extends BaseEntity{
 
     @Id

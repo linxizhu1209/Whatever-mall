@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(name="delivery")
 public class Delivery extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
