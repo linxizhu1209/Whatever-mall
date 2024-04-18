@@ -43,6 +43,11 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	// redis 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	//구글 smtp 사용 의존성
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
+
+
+
 }
 
 tasks.named('test') {
