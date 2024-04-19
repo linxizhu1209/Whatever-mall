@@ -32,14 +32,14 @@ public class AESUtil {
             throw new RuntimeException(); // 예외 처리 나중에
         }
     }
-    public String decrypt(String str) throws Exception {
+    public String decrypt(String str) {
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, new IvParameterSpec(IV.getBytes("UTF-8")));
 
             return new String(cipher.doFinal(decodeBase64(str)), "UTF-8");
         } catch (Exception e) {
-            throw new Exception(); // 예외처리 나중에
+            throw new RuntimeException(); // 예외처리 나중에
         }
     }
 
