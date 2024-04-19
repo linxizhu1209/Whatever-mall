@@ -51,7 +51,7 @@ public class AuthService {
     public CommonResponseDto signup(SignupInfo signupInfo) throws Exception {
         String encodePwd =  passwordEncoder.encode(signupInfo.getPassword());
         // 이미 이메일로 회원가입되어있는지 확인
-        checkDuplicatedEmail(signupInfo.getEmail());
+        if(!checkDuplicatedEmail(signupInfo.getEmail())) throw new RuntimeException("이미 가입되어있는 이메일 입니다.");
         // 이름, 전화번호, 주소, 이메일 암호화
         String encryptRegistNum = aesUtil.encrypt(signupInfo.getRegistration());
         String encryptName = aesUtil.encrypt(signupInfo.getName());
@@ -67,11 +67,12 @@ public class AuthService {
     }
 
 
-    private void checkDuplicatedEmail(String email){
-        Optional<Users> user = usersRepository.findByEmail(email);
+    private boolean checkDuplicatedEmail(String email){
+        Optional<Users> user = usersRepository.findByEmail(aesUtil.encrypt(email));
         if(user.isPresent()){
-            throw new RuntimeException("이미 회원가입되어 있는 이메일입니다");
+            return false;
         }
+        return true;
     }
 
 
@@ -97,14 +98,17 @@ public class AuthService {
 
     public ResponseEntity login(LoginInfo loginInfo, HttpServletResponse httpServletResponse) {
         Users user = usersRepository.findByEmail(aesUtil.encrypt(loginInfo.getEmail())).orElseThrow();// "이메일과 일치하는 유저가 존재하지않습니다. 확인해주세요"
-        // todo 이메일, 유저이름, 주소 등 암호화하여 저장했으므로 비교할때 해독해서 비교해야함
+
+        if(user.getRole()==null){
+            // todo 만약 인증확인 메일이 유효시간이 있다면, 다시 메일을 보내주는 작업을 추가
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("이메일 인증이 완료되지 않은 회원입니다. 이메일 인증을 완료해주세요");
+        }
+
         Map<String,String> response = new HashMap<>();
 
         try{
             UsernamePasswordAuthenticationToken authenticationToken = toAuthentication(user.getEmail(),user.getPassword());
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
-            // todo 로그아웃 토큰이 있는 경우 삭제하는 로직 추가 예정
 
             String accessToken = "";
             String refreshToken = "";
