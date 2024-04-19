@@ -50,11 +50,10 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String accessToken = jwtTokenProvider.resolveAccessToken(request);
         if(authentication!=null){
             new SecurityContextLogoutHandler().logout(request,response,authentication);
-            String email = authentication.getName();
-            return authService.logout(email,accessToken);
+            String token = authentication.getCredentials().toString();
+            return authService.logout(token);
         }
        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("로그아웃에 실패했습니다!");
     }

@@ -133,10 +133,9 @@ public class AuthService {
         return new UsernamePasswordAuthenticationToken(email,pwd);
     }
 
-    public ResponseEntity logout(String email, String accessToken) {
+    public ResponseEntity logout(String accessToken) {
         Long expiration = jwtTokenProvider.getExpiration(accessToken);
-        String refresh = (String)redisTemplate.opsForValue().get("RF: "+email);
-        log.info("로그아웃키"+refresh);
+        String email = jwtTokenProvider.getEmailByToken(accessToken);
         redisTemplate.opsForValue().set(accessToken,"logout",expiration, TimeUnit.MILLISECONDS);
         redisUtil.delete("RF: "+email);
         return ResponseEntity.status(HttpStatus.OK).body("정상적으로 로그아웃되었습니다.");

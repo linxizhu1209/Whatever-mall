@@ -44,8 +44,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String resolveToken(HttpServletRequest request){
         String token = request.getHeader(AUTHORIZATION_HEADER);
-        if(StringUtils.hasText(token)&&token.startsWith(PREFIX)){
-            return token.substring(7);
+        log.info("토큰정보:"+token);
+        if(StringUtils.hasText(token)){
+            return token;
         }
         return null;
     }
