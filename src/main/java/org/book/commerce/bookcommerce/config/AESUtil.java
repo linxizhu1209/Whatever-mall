@@ -23,13 +23,13 @@ public class AESUtil {
         secretKeySpec = new SecretKeySpec(key,"AES");
     }
 
-    public String encrypt(String str) throws Exception {
+    public String encrypt(String str) {
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, new IvParameterSpec(IV.getBytes()));
             return encodeBase64(cipher.doFinal(str.getBytes(StandardCharsets.UTF_8)));
         }catch (Exception e){
-            throw new Exception(); // 예외 처리 나중에
+            throw new RuntimeException(); // 예외 처리 나중에
         }
     }
     public String decrypt(String str) throws Exception {

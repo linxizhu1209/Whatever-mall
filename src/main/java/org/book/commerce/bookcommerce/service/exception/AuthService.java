@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @RequiredArgsConstructor
@@ -94,13 +95,13 @@ public class AuthService {
     }
 // todo : 만약 인증 시간 만료로 인증 못했을 시 다시 인증번호 전송하도록
 
-    public ResponseEntity login(LoginInfo loginInfo, HttpServletResponse httpServletResponse) throws Exception {
+    public ResponseEntity login(LoginInfo loginInfo, HttpServletResponse httpServletResponse) {
         Users user = usersRepository.findByEmail(aesUtil.encrypt(loginInfo.getEmail())).orElseThrow();// "이메일과 일치하는 유저가 존재하지않습니다. 확인해주세요"
         // todo 이메일, 유저이름, 주소 등 암호화하여 저장했으므로 비교할때 해독해서 비교해야함
         Map<String,String> response = new HashMap<>();
 
         try{
-            UsernamePasswordAuthenticationToken authenticationToken = toAuthentication(loginInfo.getEmail(),loginInfo.getPassword());
+            UsernamePasswordAuthenticationToken authenticationToken = toAuthentication(user.getEmail(),user.getPassword());
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
             // todo 로그아웃 토큰이 있는 경우 삭제하는 로직 추가 예정
@@ -110,18 +111,16 @@ public class AuthService {
 
             if(!passwordEncoder.matches(loginInfo.getPassword(), user.getPassword())) throw new RuntimeException("비밀번호가 틀렸습니다. 다시 입력해주세요");
 
-            accessToken = jwtTokenProvider.createAccessToken(user.getEmail());
-            refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail());
+            accessToken = jwtTokenProvider.createAccessToken(user);
+            refreshToken = jwtTokenProvider.createRefreshToken(user);
 
-            redisTemplate.opsForValue().set(loginInfo.getEmail(), accessToken, Duration.ofHours(1L));
-            redisTemplate.opsForValue().set("RF: "+loginInfo.getEmail(),refreshToken,Duration.ofHours(3L));
+            redisTemplate.opsForValue().set("RF: "+user.getEmail(),refreshToken,Duration.ofHours(3L));
 
             httpServletResponse.addCookie(new Cookie("refresh_token",refreshToken));
             response.put("http_status", HttpStatus.OK.toString());
             response.put("message","로그인되었습니다");
             response.put("token_type",BEARER_TYPE);
             response.put("access_token",accessToken);
-            response.put("refresh_token",refreshToken);
             response.put("roles",user.getRole().toString());
             return ResponseEntity.ok(response);
         } catch(BadCredentialsException be){
@@ -132,6 +131,32 @@ public class AuthService {
 
     private UsernamePasswordAuthenticationToken toAuthentication(String email,String pwd) {
         return new UsernamePasswordAuthenticationToken(email,pwd);
+    }
+
+    public ResponseEntity logout(String email, String accessToken) {
+        Long expiration = jwtTokenProvider.getExpiration(accessToken);
+        String refresh = (String)redisTemplate.opsForValue().get("RF: "+email);
+        log.info("로그아웃키"+refresh);
+        redisTemplate.opsForValue().set(accessToken,"logout",expiration, TimeUnit.MILLISECONDS);
+        redisUtil.delete("RF: "+email);
+        return ResponseEntity.status(HttpStatus.OK).body("정상적으로 로그아웃되었습니다.");
+    }
+
+    public ResponseEntity refresh(String token) {
+        String email = jwtTokenProvider.getEmailByToken(token); // 암호화된 이메일
+        String accessToken = checkByToken(email);
+        if(redisTemplate.opsForValue().get("RF: "+email)!=null){
+            Map<String,String> response = new HashMap<>();
+            response.put("access_token",accessToken);
+            response.put("http_status",HttpStatus.CREATED.toString());
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 유저입니다");
+    }
+
+    private String checkByToken(String email) {
+        Users user = usersRepository.findByEmail(email).orElseThrow();
+        return jwtTokenProvider.createAccessToken(user);
     }
 }
 
