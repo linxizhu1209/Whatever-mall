@@ -30,10 +30,10 @@ public class SecurityConfig {
 
     private final String[] PERMIT_URL = {
             "/","/**","/auth/**","/css/**","/images/**","/js/**","/favicon.ico","/h2-console/**"
-            ,"/swagger-ui.html","/swagger-ui/**","/api-docs/**","/v3/**"
+            ,"/swagger-ui.html","/swagger-ui/**","/api-docs/**","/v3/**","/auth/login/**"
     };
     private final String[] USER_URL = {
-            "/user/**"
+            "/user/**", "auth/logout"
     };
     private final String[] ADMIN_URL = {
             "/admin/**"
