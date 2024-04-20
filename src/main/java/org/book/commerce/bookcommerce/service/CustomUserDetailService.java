@@ -1,4 +1,4 @@
-package org.book.commerce.bookcommerce.service.exception;
+package org.book.commerce.bookcommerce.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

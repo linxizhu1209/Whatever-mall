@@ -1,10 +1,10 @@
-package org.book.commerce.bookcommerce.controller;
+package org.book.commerce.bookcommerce.web.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.book.commerce.bookcommerce.controller.dto.MyPageDto;
-import org.book.commerce.bookcommerce.controller.dto.UpdateInfo;
+import org.book.commerce.bookcommerce.web.dto.MyPageDto;
+import org.book.commerce.bookcommerce.web.dto.UpdateInfo;
 import org.book.commerce.bookcommerce.repository.entity.CustomUserDetails;
-import org.book.commerce.bookcommerce.service.exception.UserService;
+import org.book.commerce.bookcommerce.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;

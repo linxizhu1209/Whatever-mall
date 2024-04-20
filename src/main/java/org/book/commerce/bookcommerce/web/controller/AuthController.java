@@ -1,4 +1,4 @@
-package org.book.commerce.bookcommerce.controller;
+package org.book.commerce.bookcommerce.web.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -6,10 +6,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.book.commerce.bookcommerce.config.security.JwtTokenProvider;
-import org.book.commerce.bookcommerce.controller.dto.CommonResponseDto;
-import org.book.commerce.bookcommerce.controller.dto.LoginInfo;
-import org.book.commerce.bookcommerce.controller.dto.SignupInfo;
-import org.book.commerce.bookcommerce.service.exception.AuthService;
+import org.book.commerce.bookcommerce.web.dto.CommonResponseDto;
+import org.book.commerce.bookcommerce.web.dto.LoginInfo;
+import org.book.commerce.bookcommerce.web.dto.SignupInfo;
+import org.book.commerce.bookcommerce.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

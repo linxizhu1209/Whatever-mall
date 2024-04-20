@@ -1,9 +1,9 @@
-package org.book.commerce.bookcommerce.service.exception;
+package org.book.commerce.bookcommerce.service;
 
 import lombok.RequiredArgsConstructor;
 import org.book.commerce.bookcommerce.config.AESUtil;
-import org.book.commerce.bookcommerce.controller.dto.MyPageDto;
-import org.book.commerce.bookcommerce.controller.dto.UpdateInfo;
+import org.book.commerce.bookcommerce.web.dto.MyPageDto;
+import org.book.commerce.bookcommerce.web.dto.UpdateInfo;
 import org.book.commerce.bookcommerce.repository.UsersRepository;
 import org.book.commerce.bookcommerce.repository.entity.Users;
 import org.springframework.http.HttpStatus;
