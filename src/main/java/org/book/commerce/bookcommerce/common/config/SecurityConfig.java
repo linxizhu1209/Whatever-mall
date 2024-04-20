@@ -29,7 +29,7 @@ public class SecurityConfig {
             ,"/swagger-ui.html","/swagger-ui/**","/api-docs/**","/v3/**","/auth/login/**","/product/**"
     };
     private final String[] USER_URL = {
-            "/user/**", "auth/logout",
+            "/user/**", "auth/logout","/cart/**"
     };
     private final String[] ADMIN_URL = {
             "/admin/**", "/product/admin/**"
