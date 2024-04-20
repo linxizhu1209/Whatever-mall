@@ -17,9 +17,16 @@ spring:
   jwt:
     secret: ${JWT_SECRET}
   default:
-    admin_id: heeju
-    admin_pwd: juju1234
-
+    admin_id: imMaster@naver.com
+    admin_pwd: 1234
+  thymeleaf:
+    suffix: .html
+    prefix: classpath:templates/
+    cache: false
+    check-template-location: true
+    mode: HTML
+  mvc:
+    static-path-pattern: "/static/**"
 
   aes:
     secret: ${AES_KEY}
