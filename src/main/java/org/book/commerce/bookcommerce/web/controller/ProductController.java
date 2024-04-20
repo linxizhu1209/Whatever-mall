@@ -1,24 +1,17 @@
-package org.book.commerce.bookcommerce.controller;
+package org.book.commerce.bookcommerce.web.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.book.commerce.bookcommerce.controller.dto.AddProductDto;
-import org.book.commerce.bookcommerce.controller.dto.AllProductList;
-import org.book.commerce.bookcommerce.controller.dto.EditProduct;
-import org.book.commerce.bookcommerce.controller.dto.ProductDetail;
+import org.book.commerce.bookcommerce.web.dto.AddProductDto;
+import org.book.commerce.bookcommerce.web.dto.AllProductList;
+import org.book.commerce.bookcommerce.web.dto.EditProduct;
+import org.book.commerce.bookcommerce.web.dto.ProductDetail;
 import org.book.commerce.bookcommerce.repository.entity.CustomUserDetails;
-import org.book.commerce.bookcommerce.repository.entity.Product;
-import org.book.commerce.bookcommerce.service.exception.CustomUserDetailService;
-import org.book.commerce.bookcommerce.service.exception.ProductService;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.book.commerce.bookcommerce.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 @RequiredArgsConstructor

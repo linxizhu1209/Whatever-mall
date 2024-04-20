@@ -5,10 +5,8 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.book.commerce.bookcommerce.repository.UsersRepository;
 import org.book.commerce.bookcommerce.repository.entity.Users;
-import org.book.commerce.bookcommerce.service.exception.AuthService;
-import org.book.commerce.bookcommerce.service.exception.CustomUserDetailService;
+import org.book.commerce.bookcommerce.service.CustomUserDetailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,7 +18,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.Base64;
 import java.util.Date;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor

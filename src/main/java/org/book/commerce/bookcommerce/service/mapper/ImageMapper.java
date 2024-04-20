@@ -1,6 +1,6 @@
-package org.book.commerce.bookcommerce.service.exception.mapper;
+package org.book.commerce.bookcommerce.service.mapper;
 
-import org.book.commerce.bookcommerce.controller.dto.ImgList;
+import org.book.commerce.bookcommerce.web.dto.ImgList;
 import org.book.commerce.bookcommerce.repository.entity.Image;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

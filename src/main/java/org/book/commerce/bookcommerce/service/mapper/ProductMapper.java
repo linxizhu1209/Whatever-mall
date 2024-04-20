@@ -1,7 +1,7 @@
-package org.book.commerce.bookcommerce.service.exception.mapper;
+package org.book.commerce.bookcommerce.service.mapper;
 
 
-import org.book.commerce.bookcommerce.controller.dto.AllProductList;
+import org.book.commerce.bookcommerce.web.dto.AllProductList;
 import org.book.commerce.bookcommerce.repository.entity.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

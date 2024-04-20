@@ -1,4 +1,4 @@
-package org.book.commerce.bookcommerce.service.exception;
+package org.book.commerce.bookcommerce.service;
 
 
 import jakarta.mail.MessagingException;
@@ -7,12 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.book.commerce.bookcommerce.config.AESUtil;
-import org.book.commerce.bookcommerce.config.RedisConfig;
 import org.book.commerce.bookcommerce.config.RedisUtil;
 import org.book.commerce.bookcommerce.config.security.JwtTokenProvider;
-import org.book.commerce.bookcommerce.controller.dto.CommonResponseDto;
-import org.book.commerce.bookcommerce.controller.dto.LoginInfo;
-import org.book.commerce.bookcommerce.controller.dto.SignupInfo;
+import org.book.commerce.bookcommerce.web.dto.CommonResponseDto;
+import org.book.commerce.bookcommerce.web.dto.LoginInfo;
+import org.book.commerce.bookcommerce.web.dto.SignupInfo;
 import org.book.commerce.bookcommerce.repository.UsersRepository;
 import org.book.commerce.bookcommerce.repository.entity.Role;
 import org.book.commerce.bookcommerce.repository.entity.Users;
@@ -22,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

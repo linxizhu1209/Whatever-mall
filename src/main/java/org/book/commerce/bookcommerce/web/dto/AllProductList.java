@@ -1,4 +1,4 @@
-package org.book.commerce.bookcommerce.controller.dto;
+package org.book.commerce.bookcommerce.web.dto;
 
 import lombok.Builder;
 import lombok.Getter;
