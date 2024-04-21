@@ -1,15 +1,15 @@
 package org.book.commerce.bookcommerce.domain.order.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.book.commerce.bookcommerce.common.entity.BaseEntity;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
+@Setter
 @Table(name="orders")
 public class Order extends BaseEntity {
     @Id
@@ -21,5 +21,6 @@ public class Order extends BaseEntity {
     @Enumerated(EnumType.ORDINAL)
     private OrderStatus status;
 
-
+    @Column(name="user_email")
+    private String userEmail;
 }

@@ -2,7 +2,13 @@ package org.book.commerce.bookcommerce.domain.order.domain;
 
 public enum OrderStatus {
     ORDER_COMPLETE("주문완료"),
-    ORDER_CANCEL("주문취소");
+    REQ_CANCEL("취소신청"),
+    ORDER_CANCEL("주문취소"),
+    SHIPPING("배송중"),
+    FINISH_SHIPPING("배송완료"),
+    REQ_REFUND("반품신청"),
+    FINISH_REFUND("반품완료");
+
 
     private final String status;
 
