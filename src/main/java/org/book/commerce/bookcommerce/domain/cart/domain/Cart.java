@@ -24,5 +24,10 @@ public class Cart {
     @Column(name="count")
     private int count;
 
+    @Column(name="status")
+    @Enumerated(EnumType.ORDINAL)
+    private CartStatus status;
 
+    @Column(name="orderId")
+    private Long orderId; // 주문 후 생성되는 값
 }
