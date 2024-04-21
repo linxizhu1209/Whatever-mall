@@ -20,9 +20,13 @@ public class WishService {
     private final WishListRepository wishListRepository;
     private final ProductRepository productRepository;
     public ResponseEntity addWish(CustomUserDetails customUserDetails, Long productId) {
+        if(wishListRepository.existsByUserEmailAndAndProductId(customUserDetails.getUsername(), productId)){
+           throw new RuntimeException("이미 찜 등록되어있는 상품입니다.");
+        }
         WishList wishList = WishList.builder().productId(productId).userEmail(customUserDetails.getUsername()).build();
         wishListRepository.save(wishList);
         return ResponseEntity.status(HttpStatus.OK).body("찜 목록에 추가되었습니다!");
+        // todo 이미 추가되어잇는 상품이면 추가되지 않도록 해야함
     }
 
     public ResponseEntity deleteWish(Long productId) {
