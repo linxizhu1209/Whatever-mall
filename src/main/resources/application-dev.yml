@@ -37,7 +37,7 @@ spring:
     default-consumes-media-type: application/json;charset=UTF-8
     cache:
       disabled: true
-    packages-to-scan: org.book.commerce.bookcommerce.controller
+    packages-to-scan: org.book.commerce.bookcommerce.domain
     api-docs:
       path: /swagger-ui
   datasource:

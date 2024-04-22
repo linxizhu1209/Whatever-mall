@@ -18,7 +18,7 @@ import java.util.List;
 public class Scheduler {
     private final OrderService orderService;
 
-    @Scheduled(cron="0 */5 * * * *") // 30분에 한번씩
+    @Scheduled(cron="0 */30 * * * *") // 30분에 한번씩
     @Transactional
     public void exceedDay(){
         log.info("스케쥴러 작동중: 현재시각 : "+ LocalDateTime.now());
