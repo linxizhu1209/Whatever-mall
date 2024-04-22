@@ -16,7 +16,9 @@ import org.book.commerce.bookcommerce.domain.product.domain.Product;
 import org.book.commerce.bookcommerce.domain.product.repository.ProductRepository;
 import org.book.commerce.bookcommerce.domain.user.domain.CustomUserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,7 +79,7 @@ public class OrderService {
             throw new RuntimeException("배송중인 상품으로 주문 취소가 불가능합니다."); // 에러보다는 클라이언트한테 메시지 던지게 리팩터링 예정
         }
     }
-    // TODO 취소신청 후 하루지나면 취소완료로 상태변경
+
     public void refundOrder(Long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow();
         if(order.getStatus()==OrderStatus.FINISH_SHIPPING){
@@ -89,7 +91,40 @@ public class OrderService {
         }
     }
 
+    @Transactional
+    public void exceedOrderDay() {
+        List<Order> allOrders = orderRepository.findAll();
 
+        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime before24Hours = currentTime.minusHours(24);
 
+        // 모든 주문에 대한 상태 업데이트 및 처리
+        for (Order order : allOrders) {
+            OrderStatus currentStatus = order.getStatus();
+            boolean isMoreThan24HoursAgo = order.getUpdatedAt().isBefore(before24Hours);
 
+            if (currentStatus == OrderStatus.ORDER_COMPLETE && isMoreThan24HoursAgo) {
+                order.setStatus(OrderStatus.SHIPPING);
+            } else if (currentStatus == OrderStatus.SHIPPING && isMoreThan24HoursAgo) {
+                order.setStatus(OrderStatus.FINISH_SHIPPING);
+            } else if (currentStatus == OrderStatus.REQ_REFUND && isMoreThan24HoursAgo) {
+                order.setStatus(OrderStatus.FINISH_REFUND);
+                returnStock(order);
+            } else if (currentStatus == OrderStatus.REQ_CANCEL && isMoreThan24HoursAgo) {
+                order.setStatus(OrderStatus.ORDER_CANCEL);
+                returnStock(order);
+            }
+
+            orderRepository.save(order);
+        }
+    }
+
+    private void returnStock(Order order){
+        List<Cart> cartList = cartRepository.findAllByOrderId(order.getOrderId());
+        for(Cart cart:cartList){
+            Product product = productRepository.findById(cart.getProductId()).orElseThrow();
+            product.setStock(product.getStock()+cart.getCount());
+            productRepository.save(product);
+        }
+    }
 }
