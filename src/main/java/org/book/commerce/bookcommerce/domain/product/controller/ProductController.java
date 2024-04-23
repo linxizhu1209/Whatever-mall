@@ -25,9 +25,8 @@ public class ProductController {
     private final ProductService productService;
     @PostMapping("/admin/add")//,consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "관리자의 물품 등록",description = "관리자가 묾품을 등록한다")
-    public ResponseEntity addProduct(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                     @Valid @RequestBody AddProductDto addProductDto){ //@RequestPart(name="productImage", required = false) MultipartFile productImages)     {
-        return productService.addProduct(customUserDetails,addProductDto);
+    public ResponseEntity addProduct(@Valid @RequestBody AddProductDto addProductDto){ //@RequestPart(name="productImage", required = false) MultipartFile productImages)     {
+        return productService.addProduct(addProductDto);
     }
 
     @GetMapping("")

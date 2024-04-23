@@ -1,6 +1,7 @@
 package org.book.commerce.bookcommerce.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.book.commerce.bookcommerce.common.exception.NotFoundException;
 import org.book.commerce.bookcommerce.common.util.AESUtil;
 import org.book.commerce.bookcommerce.domain.user.dto.MyPageDto;
 import org.book.commerce.bookcommerce.domain.user.dto.UpdateInfo;
@@ -19,14 +20,14 @@ public class UserService {
     private final AESUtil aesUtil;
     private final PasswordEncoder passwordEncoder;
     public ResponseEntity<MyPageDto> getMypage(String email) {
-        Users user = usersRepository.findByEmail(email).orElseThrow();
+        Users user = usersRepository.findByEmail(email).orElseThrow(()->new NotFoundException("회원을 찾을 수 없습니다"));
         MyPageDto mypage = MyPageDto.builder().email(aesUtil.decrypt(user.getEmail())).address(aesUtil.decrypt(user.getAddress()))
                 .phonenum(aesUtil.decrypt(user.getPhoneNum())).build();
         return ResponseEntity.status(HttpStatus.OK).body(mypage);
     }
 
     public ResponseEntity updateMyPage(String email, UpdateInfo updateInfo) {
-        Users user = usersRepository.findByEmail(email).orElseThrow();
+        Users user = usersRepository.findByEmail(email).orElseThrow(()->new NotFoundException("회원을 찾을 수 없습니다."));
         String address = updateInfo.getAddress();
         String password = updateInfo.getPassword();
         String phoneNum = updateInfo.getPhoneNum();

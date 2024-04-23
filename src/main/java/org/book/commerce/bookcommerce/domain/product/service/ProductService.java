@@ -1,6 +1,7 @@
 package org.book.commerce.bookcommerce.domain.product.service;
 
 import lombok.RequiredArgsConstructor;
+import org.book.commerce.bookcommerce.common.exception.NotFoundException;
 import org.book.commerce.bookcommerce.domain.product.dto.*;
 import org.book.commerce.bookcommerce.domain.product.repository.ImageRepository;
 import org.book.commerce.bookcommerce.domain.product.repository.ProductRepository;
@@ -22,7 +23,7 @@ public class ProductService {
     private final ImageRepository imageRepository;
 
     private final ImageUploadService imageUploadService;
-    public ResponseEntity addProduct(CustomUserDetails customUserDetails, AddProductDto addProductDto) {
+    public ResponseEntity addProduct(AddProductDto addProductDto) {
         Product product = Product.builder().stock(addProductDto.getStock()).name(addProductDto.getName()).price(addProductDto.getPrice())
                 .description(addProductDto.getDescription())
                 .thumbnailName(addProductDto.getImageName()).thumbnailUrl(addProductDto.getImageUrl()).build(); // 이후 어떤 관리자가 올렸는지 관리자 id도 저장할 예정
@@ -38,7 +39,7 @@ public class ProductService {
     }
 
     public ResponseEntity<ProductDetail> getProductDetail(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow();
+        Product product = productRepository.findById(productId).orElseThrow(()->new NotFoundException("일치하는 제품을 찾을 수 없습니다. 에러 발생 물품 번호:"+productId));
         List<Image> imageList = imageRepository.findAllByProductId(productId);
         List<ImgList> imgListsDto = imageList.stream().map(ImageMapper.INSTANCE::ImageEntityToDto).toList();
         ProductDetail productDetail = ProductDetail.builder().name(product.getName())
@@ -49,7 +50,7 @@ public class ProductService {
 
 
     public ResponseEntity editProduct(Long productId, EditProduct editProduct) {
-        Product product = productRepository.findById(productId).orElseThrow();
+        Product product = productRepository.findById(productId).orElseThrow(()->new NotFoundException("일치하는 제품을 찾을 수 없습니다. 에러 발생 물품 번호:"+productId));
         if(editProduct.getDescription()!=null){
             product.setDescription(editProduct.getDescription());
         }

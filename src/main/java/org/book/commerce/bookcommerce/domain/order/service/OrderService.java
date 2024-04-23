@@ -3,6 +3,11 @@ package org.book.commerce.bookcommerce.domain.order.service;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.aspectj.weaver.ast.Or;
+import org.book.commerce.bookcommerce.common.entity.ErrorCode;
+import org.book.commerce.bookcommerce.common.exception.CommonException;
+import org.book.commerce.bookcommerce.common.exception.ConflictException;
+import org.book.commerce.bookcommerce.common.exception.NotAcceptException;
+import org.book.commerce.bookcommerce.common.exception.NotFoundException;
 import org.book.commerce.bookcommerce.domain.cart.domain.Cart;
 import org.book.commerce.bookcommerce.domain.cart.domain.CartStatus;
 import org.book.commerce.bookcommerce.domain.cart.repository.CartRepository;
@@ -15,6 +20,7 @@ import org.book.commerce.bookcommerce.domain.order.repository.OrderRepository;
 import org.book.commerce.bookcommerce.domain.product.domain.Product;
 import org.book.commerce.bookcommerce.domain.product.repository.ProductRepository;
 import org.book.commerce.bookcommerce.domain.user.domain.CustomUserDetails;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,9 +44,9 @@ public class OrderService {
             cart.setOrderId(orderId); // 주문 아이디로 장바구니에서 주문목록을 조회하기위함
             cartRepository.save(cart);
             int count = cart.getCount();
-            Product product = productRepository.findById(cart.getProductId()).orElseThrow();
+            Product product = productRepository.findById(cart.getProductId()).orElseThrow(()->new NotFoundException("요청한 물품을 찾을 수 없습니다. 문제 물품 번호: "+cart.getProductId()));
             int nowStock = product.getStock()-count;
-            if(nowStock<0) throw new RuntimeException("주문하신 상품의 재고가 부족하여 구매를 할 수 없습니다. 확인해주세요. 상품 번호:"+product.getProductId());
+            if(nowStock<0) throw new ConflictException("주문하신 상품의 재고가 부족하여 구매를 할 수 없습니다. 확인해주세요. 상품 번호: "+product.getProductId());
             product.setStock(product.getStock()-count);
             productRepository.save(product);
         }
@@ -56,7 +62,7 @@ public class OrderService {
             List<Cart> cartList = cartRepository.findAllByOrderId(order.getOrderId());
             List<OrderProductListDto> orderProductListDtos = new ArrayList<>();
             for(Cart cart:cartList){
-                Product product = productRepository.findById(cart.getProductId()).orElseThrow();
+                Product product = productRepository.findById(cart.getProductId()).orElseThrow(()->new NotFoundException("요청한 물품을 찾을 수 없습니다. 문제 물품 번호: "+cart.getProductId()));
                 orderProductListDtos.add(OrderProductListDto.builder().productName(product.getName())
                         .price(product.getPrice()).count(cart.getCount()).build());
             }
@@ -70,24 +76,24 @@ public class OrderService {
     }
 
     public void cancelOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId).orElseThrow();
+        Order order = orderRepository.findById(orderId).orElseThrow(()->new NotFoundException("요청한 주문을 찾을 수 없습니다. 문제 주문 번호: "+orderId));
         if(order.getStatus()==OrderStatus.ORDER_COMPLETE){
             order.setStatus(OrderStatus.REQ_CANCEL);
             orderRepository.save(order);
         }
         else{
-            throw new RuntimeException("배송중인 상품으로 주문 취소가 불가능합니다."); // 에러보다는 클라이언트한테 메시지 던지게 리팩터링 예정
+            throw new CommonException("배송중인 상품으로 주문 취소가 불가능합니다.",ErrorCode.BAD_REQUEST);
         }
     }
 
     public void refundOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId).orElseThrow();
+        Order order = orderRepository.findById(orderId).orElseThrow(()->new NotFoundException("존재하지 않는 주문입니다."));
         if(order.getStatus()==OrderStatus.FINISH_SHIPPING){
             order.setStatus(OrderStatus.REQ_REFUND);
             orderRepository.save(order);
         }
         else{
-            throw new RuntimeException("반품이 불가능한 상태입니다.");
+            throw new NotAcceptException("반품이 불가능한 상태입니다.");
         }
     }
 
@@ -122,7 +128,7 @@ public class OrderService {
     private void returnStock(Order order){
         List<Cart> cartList = cartRepository.findAllByOrderId(order.getOrderId());
         for(Cart cart:cartList){
-            Product product = productRepository.findById(cart.getProductId()).orElseThrow();
+            Product product = productRepository.findById(cart.getProductId()).orElseThrow(()->new NotFoundException("상품을 찾을 수가 없습니다. 문제 물품 고유 번호: "+cart.getProductId()));
             product.setStock(product.getStock()+cart.getCount());
             productRepository.save(product);
         }

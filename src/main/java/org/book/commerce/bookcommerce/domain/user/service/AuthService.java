@@ -6,6 +6,10 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.book.commerce.bookcommerce.common.entity.ErrorCode;
+import org.book.commerce.bookcommerce.common.exception.CommonException;
+import org.book.commerce.bookcommerce.common.exception.ConflictException;
+import org.book.commerce.bookcommerce.common.exception.NotFoundException;
 import org.book.commerce.bookcommerce.common.util.AESUtil;
 import org.book.commerce.bookcommerce.common.util.RedisUtil;
 import org.book.commerce.bookcommerce.common.security.JwtTokenProvider;
@@ -46,10 +50,10 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final String BEARER_TYPE = "Bearer";
 
-    public CommonResponseDto signup(SignupInfo signupInfo) throws Exception {
+    public CommonResponseDto signup(SignupInfo signupInfo){
         String encodePwd =  passwordEncoder.encode(signupInfo.getPassword());
         // 이미 이메일로 회원가입되어있는지 확인
-        if(!checkDuplicatedEmail(signupInfo.getEmail())) throw new RuntimeException("이미 가입되어있는 이메일 입니다.");
+        if(!checkDuplicatedEmail(signupInfo.getEmail())) throw new ConflictException("이미 가입되어있는 이메일 입니다.");
         // 이름, 전화번호, 주소, 이메일 암호화
         String encryptRegistNum = aesUtil.encrypt(signupInfo.getRegistration());
         String encryptName = aesUtil.encrypt(signupInfo.getName());
@@ -74,7 +78,7 @@ public class AuthService {
     }
 
 
-    public void sendCodeToEmail(String toEmail, Users user) throws MessagingException {
+    public void sendCodeToEmail(String toEmail, Users user){
 
         String title = "Whatever with me 이메일 인증 확인";
         String authCode = UUID.randomUUID().toString();
@@ -84,18 +88,18 @@ public class AuthService {
     }
 
 
-    public void registerUser(String key) throws TimeoutException {
+    public void registerUser(String key) {
 
         Users user = (Users) redisUtil.get(key);
-        if(user==null) throw new TimeoutException(); // 예외 처리예정
-        Users updateUser = usersRepository.findByEmail(user.getEmail()).orElseThrow();
+        if(user==null) throw new CommonException("인증시간이 만료되었습니다. 인증메일 재전송 버튼을 눌러주세요.", ErrorCode.UNAUTHORIZED_RESPONSE);
+        Users updateUser = usersRepository.findByEmail(user.getEmail()).orElseThrow(()->new NotFoundException("일치하는 회원을 찾을 수 없습니다."));
         updateUser.setRole(Role.USER); // 회원으로 등록
         usersRepository.save(updateUser);
     }
 // todo : 만약 인증 시간 만료로 인증 못했을 시 다시 인증번호 전송하도록
 
     public ResponseEntity login(LoginInfo loginInfo, HttpServletResponse httpServletResponse) {
-        Users user = usersRepository.findByEmail(aesUtil.encrypt(loginInfo.getEmail())).orElseThrow();// "이메일과 일치하는 유저가 존재하지않습니다. 확인해주세요"
+        Users user = usersRepository.findByEmail(aesUtil.encrypt(loginInfo.getEmail())).orElseThrow(()->new NotFoundException("입력하신 이메일과 일치하는 회원이 존재하지 않습니다. 확인해주세요. 입력 이메일: "+loginInfo.getEmail()));// "이메일과 일치하는 유저가 존재하지않습니다. 확인해주세요"
 
         if(user.getRole()==null){
             // todo 만약 인증확인 메일이 유효시간이 있다면, 다시 메일을 보내주는 작업을 추가
@@ -103,20 +107,18 @@ public class AuthService {
         }
 
         Map<String,String> response = new HashMap<>();
+        UsernamePasswordAuthenticationToken authenticationToken = toAuthentication(user.getEmail(),user.getPassword());
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-        try{
-            UsernamePasswordAuthenticationToken authenticationToken = toAuthentication(user.getEmail(),user.getPassword());
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        String accessToken = "";
+        String refreshToken = "";
 
-            String accessToken = "";
-            String refreshToken = "";
+        if(!passwordEncoder.matches(loginInfo.getPassword(), user.getPassword())) throw new ConflictException("비밀번호가 틀렸습니다. 다시 입력해주세요");
 
-            if(!passwordEncoder.matches(loginInfo.getPassword(), user.getPassword())) throw new RuntimeException("비밀번호가 틀렸습니다. 다시 입력해주세요");
+        accessToken = jwtTokenProvider.createAccessToken(user);
+        refreshToken = jwtTokenProvider.createRefreshToken(user);
 
-            accessToken = jwtTokenProvider.createAccessToken(user);
-            refreshToken = jwtTokenProvider.createRefreshToken(user);
-
-            redisTemplate.opsForValue().set("RF: "+user.getEmail(),refreshToken,Duration.ofHours(3L));
+        redisTemplate.opsForValue().set("RF: "+user.getEmail(),refreshToken,Duration.ofHours(3L));
 
             httpServletResponse.addCookie(new Cookie("refresh_token",refreshToken));
             response.put("http_status", HttpStatus.OK.toString());
@@ -125,9 +127,7 @@ public class AuthService {
             response.put("access_token",accessToken);
             response.put("roles",user.getRole().toString());
             return ResponseEntity.ok(response);
-        } catch(BadCredentialsException be){
-            throw new RuntimeException();
-        }
+
 
     }
 
@@ -156,7 +156,7 @@ public class AuthService {
     }
 
     private String checkByToken(String email) {
-        Users user = usersRepository.findByEmail(email).orElseThrow();
+        Users user = usersRepository.findByEmail(email).orElseThrow(()->new NotFoundException("해당 회원을 찾을 수 없습니다."));
         return jwtTokenProvider.createAccessToken(user);
     }
 }
