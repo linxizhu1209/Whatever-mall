@@ -29,15 +29,14 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(orderResultDto);
     } // todo 주문했을때 재고가 없다면, 또는 재고가 한정적인데 여러명이 몰렸다면 동시성 이슈를 생각해봐야함
 
-    //todo 2. 주문 조회하기 => 주문에 대한 상태를 조회 가능(주문 당일 주문완료 및 주문취소, 주문 후 +1일에 배송중, +2일에 배송완료)
     @Operation(summary = "나의 주문이력 조회",description = "나의 주문이력을 조회한다(주문번호,주문일자,주문상태 조회 가능")
     @GetMapping("/orderlist")
     public ResponseEntity<List<OrderlistDto>> orderList(@AuthenticationPrincipal CustomUserDetails customUserDetails){
         //todo 주문번호, 주문일자와 주문상태가 나타날건데,,,,, 여태 주문했던 내역을 모두 보여준다. 즉, 배송완료된 상품들까지,
+        // todo 최신순으로 보여주기!
         List<OrderlistDto> orderLists = orderService.getOrderList(customUserDetails);
         return ResponseEntity.status(HttpStatus.OK).body(orderLists);
     }
-    // todo 3. 주문 취소하기 => 주문 취소시, 현재 상태가 주문완료인지 확인한다. 즉, 주문 당일인지 확인 => 취소 후 재고 복구, 상태는 취소완료
     @Operation(summary = "주문 취소",description = "주문한 물품을 주문 취소한다")
     @PutMapping("/cancel/{orderId}")
     public ResponseEntity cancelOrder(@PathVariable Long orderId){

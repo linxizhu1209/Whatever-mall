@@ -44,6 +44,8 @@ public class AuthController {
         return "회원인증이 성공하였습니다";
     }
 
+    // todo 인증메일 다시보내기
+
     @Operation(summary = "로그인",description = "로그인이 성공하면 회원에게 토큰을 발급한다")
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginInfo loginInfo, HttpServletResponse httpServletResponse) throws Exception {
