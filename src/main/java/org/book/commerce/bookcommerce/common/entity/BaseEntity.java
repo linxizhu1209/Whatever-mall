@@ -1,5 +1,9 @@
 package org.book.commerce.bookcommerce.common.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -19,10 +23,15 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
 public class BaseEntity {
+
+    @JsonSerialize(using= LocalDateSerializer.class)
+    @JsonDeserialize(using= LocalDateTimeDeserializer.class)
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
+    @JsonSerialize(using= LocalDateSerializer.class)
+    @JsonDeserialize(using= LocalDateTimeDeserializer.class)
     @LastModifiedDate
     private LocalDateTime updatedAt;
 

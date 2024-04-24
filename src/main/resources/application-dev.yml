@@ -6,8 +6,7 @@ spring:
     open-in-view: false
     show-sql: true
     hibernate:
-      ddl-auto: update
-  data:
+      ddl-auto: create
     redis:
       host: 127.0.0.1
       port: 6379
@@ -15,7 +14,7 @@ spring:
       repositories:
         enabled: false
   jwt:
-    secret: ${JWT_SECRET}
+    secret: "ecommercedasfasfwqdwfqwgggsassaffqwljkjwfklwqjfkwlqjfiowqfnkngklqjgkqwlgjlkqwfwwghqehhhhhs"
   default:
     admin_id: imMaster@naver.com
     admin_pwd: 1234
@@ -29,7 +28,7 @@ spring:
     static-path-pattern: "/static/**"
 
   aes:
-    secret: ${AES_KEY}
+    secret: "qrWkovCNhAToTFwnSMXXsy9aSfEOt9G2"
   logging:
     config: classpath:logback-spring-dev.xml
   springdoc:
@@ -41,9 +40,9 @@ spring:
     api-docs:
       path: /swagger-ui
   datasource:
-    url: jdbc:mysql://localhost:3306/whateverWithMe?useUnicode=true&characterEncoding=UTF-8
-    username: root
-    password: 12341234
+    url: jdbc:mysql://ecommerce-mysql:3306/ecommerce?useUnicode=true&characterEncoding=UTF-8
+    username: heeju
+    password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
   mail:
     host: smtp.gmail.com

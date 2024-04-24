@@ -50,5 +50,6 @@ public class CartController {
     public ResponseEntity<List<CartListDto>> getCartlist(@AuthenticationPrincipal CustomUserDetails customUserDetails){
         List<CartListDto> cartListDto = cartService.getCartList(customUserDetails);
         return ResponseEntity.status(HttpStatus.OK).body(cartListDto);
+        //todo 만약 장바구니에 아무것도 없다면, 빈값으로 반환해도 상관이없는가?
     }
 }

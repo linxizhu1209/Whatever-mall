@@ -1,0 +1,52 @@
+
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: ecommerce-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: ecommerce
+      MYSQL_USER: heeju
+      MYSQL_PASSWORD: 1234
+      TZ: 'Asia/Seoul'
+    ports:
+      - "3307:3306"
+    networks:
+      - test_network
+  redis:
+    image: redis
+    container_name: ecommerce_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - test_network
+    environment:
+      TZ: 'Asia/Seoul'
+
+  application:
+    container_name: ecommerce_docker
+    restart: on-failure
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://ecommerce-mysql:3306/ecommerce?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: "heeju"
+      SPRING_DATASOURCE_PASSWORD: "1234"
+      SPRING_JWT_SECRET: "ecommercedasfasfwqdwfqwgggsassaffqwljkjwfklwqjfkwlqjfiowqfnkngklqjgkqwlgjlkqwfwwghqehhhhhs"
+      SPRING_AES_SECRET: "qrWkovCNhAToTFwnSMXXsy9aSfEOt9G2"
+      SPRING_MAIL_PASSWORD: "tyazqjalpufrczim"
+      TZ: 'Asia/Seoul'
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - test_network
+
+networks:
+  test_network:
