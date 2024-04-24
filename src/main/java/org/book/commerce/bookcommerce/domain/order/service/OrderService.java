@@ -1,26 +1,24 @@
 package org.book.commerce.bookcommerce.domain.order.service;
 
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.atn.SemanticContext;
-import org.aspectj.weaver.ast.Or;
 import org.book.commerce.bookcommerce.common.entity.ErrorCode;
 import org.book.commerce.bookcommerce.common.exception.CommonException;
 import org.book.commerce.bookcommerce.common.exception.ConflictException;
 import org.book.commerce.bookcommerce.common.exception.NotAcceptException;
 import org.book.commerce.bookcommerce.common.exception.NotFoundException;
 import org.book.commerce.bookcommerce.domain.cart.domain.Cart;
-import org.book.commerce.bookcommerce.domain.cart.domain.CartStatus;
 import org.book.commerce.bookcommerce.domain.cart.repository.CartRepository;
 import org.book.commerce.bookcommerce.domain.order.domain.Order;
 import org.book.commerce.bookcommerce.domain.order.domain.OrderStatus;
+import org.book.commerce.bookcommerce.domain.order.domain.ProductOrder;
 import org.book.commerce.bookcommerce.domain.order.dto.OrderProductListDto;
 import org.book.commerce.bookcommerce.domain.order.dto.OrderResultDto;
 import org.book.commerce.bookcommerce.domain.order.dto.OrderlistDto;
 import org.book.commerce.bookcommerce.domain.order.repository.OrderRepository;
+import org.book.commerce.bookcommerce.domain.order.repository.ProductOrderRepository;
 import org.book.commerce.bookcommerce.domain.product.domain.Product;
 import org.book.commerce.bookcommerce.domain.product.repository.ProductRepository;
 import org.book.commerce.bookcommerce.domain.user.domain.CustomUserDetails;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,20 +32,22 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
+    private final ProductOrderRepository productOrderRepository;
     public OrderResultDto payOrder(CustomUserDetails customUserDetails) {
         String userId = customUserDetails.getUsername();
-        List<Cart> cartList = cartRepository.findAllByUserEmailAndStatus(userId, CartStatus.ORDER_INCOMPLETE); // 장바구니 삭제보다는 주문완료로 상태변경, 그리고 주문 테이블에는 주문완료로
+        List<Cart> cartList = cartRepository.findAllByUserEmail(userId);
         Order order = Order.builder().userEmail(userId).status(OrderStatus.ORDER_COMPLETE).build();
         Long orderId = orderRepository.save(order).getOrderId();
         for(Cart cart:cartList){
-            cart.setStatus(CartStatus.ORDER_COMPLETE);
-            cart.setOrderId(orderId); // 주문 아이디로 장바구니에서 주문목록을 조회하기위함
-            cartRepository.save(cart);
-            int count = cart.getCount();
+            // 장바구니는 지우고, 주문내역은 생성하고
+            ProductOrder productOrder = ProductOrder.builder().productId(cart.getProductId())
+                    .orderId(orderId).count(cart.getCount()).build();
+            productOrderRepository.save(productOrder);
             Product product = productRepository.findById(cart.getProductId()).orElseThrow(()->new NotFoundException("요청한 물품을 찾을 수 없습니다. 문제 물품 번호: "+cart.getProductId()));
-            int nowStock = product.getStock()-count;
+            int nowStock = product.getStock()-cart.getCount();
             if(nowStock<0) throw new ConflictException("주문하신 상품의 재고가 부족하여 구매를 할 수 없습니다. 확인해주세요. 상품 번호: "+product.getProductId());
-            product.setStock(product.getStock()-count);
+            product.setStock(product.getStock()-cart.getCount());
+            cartRepository.delete(cart);
             productRepository.save(product);
         }
         return new OrderResultDto(orderId);
@@ -59,12 +59,12 @@ public class OrderService {
         List<Order> orderList = orderRepository.findAllByUserEmail(userId);
         ArrayList<OrderlistDto> orderlistDtos = new ArrayList<>();
         for(Order order:orderList){
-            List<Cart> cartList = cartRepository.findAllByOrderId(order.getOrderId());
+            List<ProductOrder> productOrderList = productOrderRepository.findAllByOrderId(order.getOrderId());
             List<OrderProductListDto> orderProductListDtos = new ArrayList<>();
-            for(Cart cart:cartList){
-                Product product = productRepository.findById(cart.getProductId()).orElseThrow(()->new NotFoundException("요청한 물품을 찾을 수 없습니다. 문제 물품 번호: "+cart.getProductId()));
+            for(ProductOrder productOrder:productOrderList){
+                Product product = productRepository.findById(productOrder.getProductId()).orElseThrow(()->new NotFoundException("요청한 물품을 찾을 수 없습니다. 문제 물품 번호: "+productOrder.getProductId()));
                 orderProductListDtos.add(OrderProductListDto.builder().productName(product.getName())
-                        .price(product.getPrice()).count(cart.getCount()).build());
+                        .price(product.getPrice()).count(productOrder.getCount()).build());
             }
             orderlistDtos.add(OrderlistDto.builder().orderId(order.getOrderId())
                     .orderStatus(order.getStatus()).orderDate(order.getCreatedAt())
@@ -99,37 +99,31 @@ public class OrderService {
 
     @Transactional
     public void exceedOrderDay() {
-        List<Order> allOrders = orderRepository.findAll();
-
-        LocalDateTime currentTime = LocalDateTime.now();
-        LocalDateTime before24Hours = currentTime.minusHours(24);
+        List<Order> orderlist = orderRepository.findAllOlderThanLast24HoursWithSpecificStatus(OrderStatus.ORDER_COMPLETE,OrderStatus.REQ_CANCEL,OrderStatus.SHIPPING,OrderStatus.REQ_REFUND);
 
         // 모든 주문에 대한 상태 업데이트 및 처리
-        for (Order order : allOrders) {
+        for (Order order : orderlist) {
             OrderStatus currentStatus = order.getStatus();
-            boolean isMoreThan24HoursAgo = order.getUpdatedAt().isBefore(before24Hours);
-
-            if (currentStatus == OrderStatus.ORDER_COMPLETE && isMoreThan24HoursAgo) {
+            if (currentStatus == OrderStatus.ORDER_COMPLETE ) {
                 order.setStatus(OrderStatus.SHIPPING);
-            } else if (currentStatus == OrderStatus.SHIPPING && isMoreThan24HoursAgo) {
+            } else if (currentStatus == OrderStatus.SHIPPING) {
                 order.setStatus(OrderStatus.FINISH_SHIPPING);
-            } else if (currentStatus == OrderStatus.REQ_REFUND && isMoreThan24HoursAgo) {
+            } else if (currentStatus == OrderStatus.REQ_REFUND) {
                 order.setStatus(OrderStatus.FINISH_REFUND);
                 returnStock(order);
-            } else if (currentStatus == OrderStatus.REQ_CANCEL && isMoreThan24HoursAgo) {
+            } else if (currentStatus == OrderStatus.REQ_CANCEL) {
                 order.setStatus(OrderStatus.ORDER_CANCEL);
                 returnStock(order);
             }
-
             orderRepository.save(order);
         }
     }
 
     private void returnStock(Order order){
-        List<Cart> cartList = cartRepository.findAllByOrderId(order.getOrderId());
-        for(Cart cart:cartList){
-            Product product = productRepository.findById(cart.getProductId()).orElseThrow(()->new NotFoundException("상품을 찾을 수가 없습니다. 문제 물품 고유 번호: "+cart.getProductId()));
-            product.setStock(product.getStock()+cart.getCount());
+        List<ProductOrder> productOrderList = productOrderRepository.findAllByOrderId(order.getOrderId());
+        for(ProductOrder productOrder:productOrderList){
+            Product product = productRepository.findById(productOrder.getProductId()).orElseThrow(()->new NotFoundException("상품을 찾을 수가 없습니다. 문제 물품 고유 번호: "+productOrder.getProductId()));
+            product.setStock(product.getStock()+productOrder.getCount());
             productRepository.save(product);
         }
     }

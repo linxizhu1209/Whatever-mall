@@ -3,6 +3,7 @@ package org.book.commerce.bookcommerce.domain.order.domain;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.book.commerce.bookcommerce.common.entity.BaseEntity;
 
@@ -10,7 +11,7 @@ import org.book.commerce.bookcommerce.common.entity.BaseEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name="product_order")
+@Getter
 public class ProductOrder extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
