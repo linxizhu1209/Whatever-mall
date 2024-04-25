@@ -1,0 +1,22 @@
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+
+dependencies {
+	implementation project(':commerce-common')
+	implementation project(':product-service')
+
+	//구글 smtp 사용 의존성
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
+
+	//mapstruct 의존성
+	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
