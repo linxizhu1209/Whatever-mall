@@ -4,53 +4,88 @@ plugins {
 	id 'io.spring.dependency-management' version '1.1.4'
 }
 
-group = 'org.book.commerce'
-version = '0.0.1-SNAPSHOT'
-
-java {
-	sourceCompatibility = '21'
+repositories {
+	mavenCentral()
 }
+
+subprojects { // settings.gradle에서 선언한 하위 모듈들의 설정을 관리 가능. 하위 모듈들에 모두 적용되는 설정들 적용
+	group = 'org.book.commerce'
+	version = '0.0.1-SNAPSHOT'
+	sourceCompatibility = '21'
+
+	apply plugin: 'java'
+	apply plugin: 'org.springframework.boot'
+	apply plugin: 'io.spring.dependency-management'
+
+	repositories {
+		mavenCentral()
+	}
+
+
+	dependencies {
+		implementation 'org.springframework.boot:spring-boot-starter-security'
+		implementation 'org.springframework.boot:spring-boot-starter-web'
+		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+		compileOnly 'org.projectlombok:lombok'
+		annotationProcessor 'org.projectlombok:lombok'
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		testImplementation 'org.springframework.security:spring-security-test'
+
+		// jwt 의존성
+		implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+		implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+		implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+		// swagger 의존성
+		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+		// mysql 의존성
+		runtimeOnly 'com.mysql:mysql-connector-j'
+		// redis 의존성
+		implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	}
+
+
+	// 스프링 클라우드 설정
+
+	bootJar { enabled = false }
+	jar { enabled = true }
+}
+
+project(':user-service') {
+	dependencies {
+		implementation project(':commerce-common')
+		implementation project(':product-service')
+	}
+}
+
+project(':product-service') {
+	dependencies {
+		implementation project(':commerce-common')
+	}
+}
+
+project(':cart-service') {
+	dependencies {
+		implementation project(':commerce-common')
+		implementation project(':product-service')
+		implementation project(':user-service')
+	}
+}
+
+project(':order-service') {
+	dependencies {
+		implementation project(':commerce-common')
+		implementation project(':product-service')
+		implementation project(':cart-service')
+		implementation project(':user-service')
+	}
+}
+
 
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
-}
-
-repositories {
-	mavenCentral()
-}
-
-dependencies {
-//	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-
-	// jwt 의존성
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
-	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-
-	// swagger 의존성
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
-	// mysql 의존성
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	// redis 의존성
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	//구글 smtp 사용 의존성
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
-
-	//mapstruct 의존성
-	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
-
-
 }
 
 tasks.named('test') {
