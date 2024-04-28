@@ -1,12 +1,12 @@
-package org.book.commerce.common.security;
+package org.book.commerce.common.config;
 
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.book.commerce.orderservice.domain.user.domain.Users;
-import org.book.commerce.orderservice.domain.user.service.CustomUserDetailService;
+import org.book.commerce.common.security.CustomUserDetailService;
+import org.book.commerce.common.security.Users;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

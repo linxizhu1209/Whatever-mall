@@ -1,6 +1,8 @@
-package org.book.commerce.userservice.domain;
+package org.book.commerce.common.security;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

@@ -7,9 +7,9 @@ import org.book.commerce.cartservice.repository.CartRepository;
 import org.book.commerce.common.exception.ConflictException;
 import org.book.commerce.cartservice.domain.Cart;
 import org.book.commerce.common.exception.NotFoundException;
+import org.book.commerce.common.security.CustomUserDetails;
 import org.book.commerce.productservice.domain.Product;
-import org.book.commerce.productservice.repository.ProductRepository;
-import org.book.commerce.userservice.domain.CustomUserDetails;
+import org.book.commerce.productservice.service.ProductService;
 import org.springframework.stereotype.Service;
 
 
@@ -21,7 +21,7 @@ import java.util.List;
 public class CartService {
 
     private final CartRepository cartRepository;
-    private final ProductRepository productRepository;
+    private final ProductService productService;
     public AddCartResult addCart(CustomUserDetails customUserDetails, Long productId, int count) {
         if(cartRepository.existsByUserEmailAndProductId(customUserDetails.getUsername(),productId)){
             throw new ConflictException("이미 장바구니에 있는 제품입니다.");
@@ -49,11 +49,15 @@ public class CartService {
         List<Cart> cartList = cartRepository.findAllByUserEmail(email);
         List<CartListDto> cartListDtos = new ArrayList<>();
         for(Cart cart:cartList){
-            Product product = productRepository.findById(cart.getProductId()).orElseThrow(()->new NotFoundException("존재하지 않는 물품입니다."));
+            Product product = productService.findProduct(cart.getProductId());
             cartListDtos.add(CartListDto.builder().productName(product.getName())
                     .productId(product.getProductId()).price(product.getPrice())
                     .count(cart.getCount()).build());
         }
         return cartListDtos;
+    }
+
+    public List<Cart> findCartList(String userId) {
+        return cartRepository.findAllByUserEmail(userId);
     }
 }

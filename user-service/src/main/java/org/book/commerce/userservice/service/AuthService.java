@@ -5,19 +5,18 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.book.commerce.common.config.JwtTokenProvider;
 import org.book.commerce.common.dto.CommonResponseDto;
 import org.book.commerce.common.entity.ErrorCode;
 import org.book.commerce.common.exception.CommonException;
 import org.book.commerce.common.exception.ConflictException;
 import org.book.commerce.common.exception.NotFoundException;
-import org.book.commerce.common.security.JwtTokenProvider;
+import org.book.commerce.common.security.Users;
+import org.book.commerce.common.security.UsersRepository;
 import org.book.commerce.common.util.AESUtil;
 import org.book.commerce.common.util.RedisUtil;
-import org.book.commerce.userservice.repository.UsersRepository;
 import org.book.commerce.userservice.dto.LoginInfo;
 import org.book.commerce.userservice.dto.SignupInfo;
-import org.book.commerce.userservice.domain.Role;
-import org.book.commerce.userservice.domain.Users;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -90,7 +89,7 @@ public class AuthService {
         Users user = (Users) redisUtil.get(key);
         if(user==null) throw new CommonException("인증시간이 만료되었습니다. 인증메일 재전송 버튼을 눌러주세요.", ErrorCode.UNAUTHORIZED_RESPONSE);
         Users updateUser = usersRepository.findByEmail(user.getEmail()).orElseThrow(()->new NotFoundException("일치하는 회원을 찾을 수 없습니다."));
-        updateUser.setRole(Role.USER); // 회원으로 등록
+        updateUser.setRole(Users.Role.USER); // 회원으로 등록
         usersRepository.save(updateUser);
     }
 // todo : 만약 인증 시간 만료로 인증 못했을 시 다시 인증번호 전송하도록

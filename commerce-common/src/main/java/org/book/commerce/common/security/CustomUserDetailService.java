@@ -2,9 +2,6 @@ package org.book.commerce.common.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.book.commerce.userservice.repository.UsersRepository;
-import org.book.commerce.userservice.domain.CustomUserDetails;
-import org.book.commerce.userservice.domain.Users;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

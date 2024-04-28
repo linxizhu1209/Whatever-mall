@@ -1,0 +1,36 @@
+#  1. 유레카 서버의 port지정
+server:
+  port: 8761
+#  유레카 서버의 고유 id를 지정
+spring:
+  application:
+    name: discovery-server
+  config:
+    import: "optional:configserver:http://localhost:8081/"
+#  profiles:
+#    active: composite
+#  data:
+#    redis:
+#      host: 127.0.0.1
+#      port: 6379
+#      password: 1234
+#      repositories:
+#        enabled: false
+## register-with-eureka : 유레카 서버로 자신의 정보를 등록할지 결정,
+## fetch-registry : 다른 서비스들의 정보를 유레카 서버로부터 받아서 로컬메모리에 캐싱하지 여부
+## 유레카 서버의 url을 지정, 이후에 유레카 API 요청 시 해당 URL로 요청보내기 가능
+#eureka:
+#  client:
+#    register-with-eureka: false
+#    fetch-registry: false
+#    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka/
+## 각 서비스들의 등록을 위한 대기시간. 해당 시간동안 대기한 후에 등록된 서비스들의 정보를 공유 (실무에서는 10분정도로 설정,지금은 작은 서비스이므로 5초)
+#  server:
+#    wait-time-in-ms-when-sync-empty: 5
+## Spring Actuator 관련 설정으로, 액츄에이터의 어떤 API를 사용할 것인지 지정하는 설정.
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"

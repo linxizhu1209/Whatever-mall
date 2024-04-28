@@ -1,4 +1,4 @@
-package org.book.commerce.common.security;
+package org.book.commerce.common.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -44,10 +44,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String resolveToken(HttpServletRequest request){
         String token = request.getHeader(AUTHORIZATION_HEADER);
-        if(StringUtils.hasText(token)){
-            return token;
+        if(StringUtils.hasText(token) && token.startsWith(PREFIX)) {
+            return token.substring(7);    // "Bearer "를 뺀 값, 즉 토큰 값
         }
         return null;
     }
-
 }

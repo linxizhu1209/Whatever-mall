@@ -1,0 +1,7 @@
+server:
+  port: 8013
+spring:
+  application:
+    name: application-product
+  config:
+    import: "optional:configserver:http://localhost:8081/"

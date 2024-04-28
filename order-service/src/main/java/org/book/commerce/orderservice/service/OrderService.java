@@ -1,13 +1,14 @@
 package org.book.commerce.orderservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.book.commerce.cartservice.service.CartService;
 import org.book.commerce.common.entity.ErrorCode;
 import org.book.commerce.common.exception.CommonException;
 import org.book.commerce.common.exception.ConflictException;
 import org.book.commerce.common.exception.NotAcceptException;
 import org.book.commerce.common.exception.NotFoundException;
 import org.book.commerce.cartservice.domain.Cart;
-import org.book.commerce.cartservice.repository.CartRepository;
+import org.book.commerce.common.security.CustomUserDetails;
 import org.book.commerce.orderservice.domain.Order;
 import org.book.commerce.orderservice.domain.OrderStatus;
 import org.book.commerce.orderservice.domain.ProductOrder;
@@ -17,8 +18,7 @@ import org.book.commerce.orderservice.dto.OrderlistDto;
 import org.book.commerce.orderservice.repository.OrderRepository;
 import org.book.commerce.orderservice.repository.ProductOrderRepository;
 import org.book.commerce.productservice.domain.Product;
-import org.book.commerce.productservice.repository.ProductRepository;
-import org.book.commerce.userservice.domain.CustomUserDetails;
+import org.book.commerce.productservice.service.ProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,12 +29,12 @@ import java.util.List;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final CartRepository cartRepository;
-    private final ProductRepository productRepository;
+    private final CartService cartService;
+    private final ProductService productService;
     private final ProductOrderRepository productOrderRepository;
     public OrderResultDto payOrder(CustomUserDetails customUserDetails) {
         String userId = customUserDetails.getUsername();
-        List<Cart> cartList = cartRepository.findAllByUserEmail(userId);
+        List<Cart> cartList = cartService.findCartList(userId);
         Order order = Order.builder().userEmail(userId).status(OrderStatus.ORDER_COMPLETE).build();
         Long orderId = orderRepository.save(order).getOrderId();
         for(Cart cart:cartList){
@@ -42,12 +42,12 @@ public class OrderService {
             ProductOrder productOrder = ProductOrder.builder().productId(cart.getProductId())
                     .orderId(orderId).count(cart.getCount()).build();
             productOrderRepository.save(productOrder);
-            Product product = productRepository.findById(cart.getProductId()).orElseThrow(()->new NotFoundException("요청한 물품을 찾을 수 없습니다. 문제 물품 번호: "+cart.getProductId()));
+            Product product = productService.findProduct(cart.getProductId());
             int nowStock = product.getStock()-cart.getCount();
             if(nowStock<0) throw new ConflictException("주문하신 상품의 재고가 부족하여 구매를 할 수 없습니다. 확인해주세요. 상품 번호: "+product.getProductId());
             product.setStock(product.getStock()-cart.getCount());
-            cartRepository.delete(cart);
-            productRepository.save(product);
+            cartService.deleteCart(cart.getCartId());
+            productService.saveProduct(product);
         }
         return new OrderResultDto(orderId);
     }
@@ -61,7 +61,7 @@ public class OrderService {
             List<ProductOrder> productOrderList = productOrderRepository.findAllByOrderId(order.getOrderId());
             List<OrderProductListDto> orderProductListDtos = new ArrayList<>();
             for(ProductOrder productOrder:productOrderList){
-                Product product = productRepository.findById(productOrder.getProductId()).orElseThrow(()->new NotFoundException("요청한 물품을 찾을 수 없습니다. 문제 물품 번호: "+productOrder.getProductId()));
+                Product product = productService.findProduct(productOrder.getProductId());
                 orderProductListDtos.add(OrderProductListDto.builder().productName(product.getName())
                         .price(product.getPrice()).count(productOrder.getCount()).build());
             }
@@ -121,9 +121,9 @@ public class OrderService {
     private void returnStock(Order order){
         List<ProductOrder> productOrderList = productOrderRepository.findAllByOrderId(order.getOrderId());
         for(ProductOrder productOrder:productOrderList){
-            Product product = productRepository.findById(productOrder.getProductId()).orElseThrow(()->new NotFoundException("상품을 찾을 수가 없습니다. 문제 물품 고유 번호: "+productOrder.getProductId()));
+            Product product = productService.findProduct(productOrder.getProductId());
             product.setStock(product.getStock()+productOrder.getCount());
-            productRepository.save(product);
+            productService.saveProduct(product);
         }
     }
 }

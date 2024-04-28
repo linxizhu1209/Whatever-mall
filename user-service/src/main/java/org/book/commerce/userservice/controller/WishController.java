@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.book.commerce.userservice.domain.CustomUserDetails;
+import org.book.commerce.common.security.CustomUserDetails;
 import org.book.commerce.userservice.dto.WishListDto;
 import org.book.commerce.userservice.service.WishService;
 import org.springframework.http.ResponseEntity;
