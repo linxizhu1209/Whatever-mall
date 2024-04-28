@@ -20,16 +20,17 @@ subprojects { // settings.gradle에서 선언한 하위 모듈들의 설정을 �
 	repositories {
 		mavenCentral()
 	}
-
-
+	ext {
+		set('springCloudVersion', "2023.0.0")
+	}
 	dependencies {
-		implementation 'org.springframework.boot:spring-boot-starter-security'
 		implementation 'org.springframework.boot:spring-boot-starter-web'
-		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
 		compileOnly 'org.projectlombok:lombok'
 		annotationProcessor 'org.projectlombok:lombok'
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 		testImplementation 'org.springframework.security:spring-security-test'
+
 
 		// jwt 의존성
 		implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
@@ -38,18 +39,19 @@ subprojects { // settings.gradle에서 선언한 하위 모듈들의 설정을 �
 
 		// swagger 의존성
 		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
-		// mysql 의존성
-		runtimeOnly 'com.mysql:mysql-connector-j'
-		// redis 의존성
-		implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	}
-
-
-	// 스프링 클라우드 설정
+	dependencyManagement {
+		imports {
+			mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+		}
+	}
 
 	bootJar { enabled = false }
 	jar { enabled = true }
 }
+
+
 
 project(':user-service') {
 	dependencies {

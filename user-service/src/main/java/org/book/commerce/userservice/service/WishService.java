@@ -1,11 +1,11 @@
 package org.book.commerce.userservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.book.commerce.orderservice.common.exception.ConflictException;
-import org.book.commerce.orderservice.common.exception.NotFoundException;
+import org.book.commerce.common.exception.ConflictException;
+import org.book.commerce.common.exception.NotFoundException;
+import org.book.commerce.common.security.CustomUserDetails;
 import org.book.commerce.productservice.domain.Product;
-import org.book.commerce.productservice.repository.ProductRepository;
-import org.book.commerce.userservice.domain.CustomUserDetails;
+import org.book.commerce.productservice.service.ProductService;
 import org.book.commerce.userservice.domain.WishList;
 import org.book.commerce.userservice.dto.WishListDto;
 import org.book.commerce.userservice.repository.WishListRepository;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WishService {
     private final WishListRepository wishListRepository;
-    private final ProductRepository productRepository;
+    private final ProductService productService;
     public ResponseEntity addWish(CustomUserDetails customUserDetails, Long productId) {
         if(wishListRepository.existsByUserEmailAndAndProductId(customUserDetails.getUsername(), productId)){
            throw new ConflictException("이미 찜 등록되어있는 상품입니다.");
@@ -39,7 +39,7 @@ public class WishService {
     // todo Product 도메인과 통신해야할 부분. 어떻게 해야할 지 고민
     public ResponseEntity<List<WishListDto>> getWishList(CustomUserDetails customUserDetails) {
         List<WishList> wishLists = wishListRepository.findAllByUserEmail(customUserDetails.getUsername());
-        List<Product> productList = wishLists.stream().map(wishList->productRepository.findById(wishList.getProductId()).orElseThrow(()->new NotFoundException("일치하는 제품을 찾을 수 없습니다."))).toList(); // 이후 msa 시 어떻게 통신할지 고민해봐야할 부분
+        List<Product> productList = wishLists.stream().map(wishList->productService.findProduct(wishList.getProductId())).toList();
         List<WishListDto> wishListDtos = productList.stream().map(WishListMapper.INSTANCE::ProductEntityToWishListDto).toList();
         return ResponseEntity.status(HttpStatus.OK).body(wishListDtos);
     }

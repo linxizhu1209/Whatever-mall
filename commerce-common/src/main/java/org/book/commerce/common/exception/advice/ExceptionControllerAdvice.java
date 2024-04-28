@@ -1,10 +1,8 @@
 package org.book.commerce.common.exception.advice;
 
 import lombok.extern.slf4j.Slf4j;
+import org.book.commerce.common.dto.ErrorResponse;
 import org.book.commerce.common.exception.*;
-import org.book.commerce.orderservice.common.dto.ErrorResponse;
-import org.book.commerce.orderservice.common.exception.*;
-import org.book.commerce.orderservice.exception.*;
 import org.springframework.boot.context.config.ConfigDataException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +36,7 @@ public class ExceptionControllerAdvice {
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(ConfigDataException.class)
+    @ExceptionHandler(ConflictException.class)
     public String handleConflictException(ConflictException ce){
         log.error("Client 요청이 충돌되어 다음처럼 출력합니다"+ce.getMessage());
         return ce.getMessage();

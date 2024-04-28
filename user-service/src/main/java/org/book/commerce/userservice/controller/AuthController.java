@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.book.commerce.common.dto.CommonResponseDto;
-import org.book.commerce.orderservice.common.dto.CommonResponseDto;
 import org.book.commerce.userservice.dto.LoginInfo;
 import org.book.commerce.userservice.dto.SignupInfo;
 import org.book.commerce.userservice.service.AuthService;

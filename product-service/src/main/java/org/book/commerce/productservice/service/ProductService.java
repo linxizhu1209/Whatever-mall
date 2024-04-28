@@ -68,4 +68,13 @@ public class ProductService {
         productRepository.save(product);
         return ResponseEntity.status(HttpStatus.OK).body("상품 수정이 완료되었습니다.");
     }
+
+    public Product findProduct(Long productId){
+        return productRepository.findById(productId).orElseThrow(()->new NotFoundException("존재하지 않는 물품입니다."));
+    }
+
+    public void saveProduct(Product product){
+        productRepository.save(product);
+    }
+
 }

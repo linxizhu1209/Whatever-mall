@@ -2,8 +2,6 @@ package org.book.commerce.common.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.book.commerce.orderservice.common.security.JwtAuthenticationFilter;
-import org.book.commerce.orderservice.common.security.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,6 +25,7 @@ public class SecurityConfig {
     private final String[] PERMIT_URL = {
             "/","/**","/auth/**","/css/**","/images/**","/js/**","/favicon.ico","/h2-console/**"
             ,"/swagger-ui.html","/swagger-ui/**","/api-docs/**","/v3/**","/auth/login/**","/product/**"
+            ,"/eureka"
     };
     private final String[] USER_URL = {
             "/user/**", "auth/logout","/cart/**"

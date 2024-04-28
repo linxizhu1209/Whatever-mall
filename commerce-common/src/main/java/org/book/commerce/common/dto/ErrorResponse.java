@@ -2,7 +2,7 @@ package org.book.commerce.common.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.book.commerce.orderservice.common.exception.CommonException;
+import org.book.commerce.common.exception.CommonException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

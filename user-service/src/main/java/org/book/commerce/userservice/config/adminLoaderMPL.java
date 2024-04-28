@@ -1,11 +1,10 @@
-package org.book.commerce.common.entity;
+package org.book.commerce.userservice.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.book.commerce.orderservice.common.util.AESUtil;
-import org.book.commerce.orderservice.domain.user.domain.Role;
-import org.book.commerce.orderservice.domain.user.domain.Users;
-import org.book.commerce.orderservice.domain.user.repository.UsersRepository;
+import org.book.commerce.common.security.Users;
+import org.book.commerce.common.security.UsersRepository;
+import org.book.commerce.common.util.AESUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,7 +38,7 @@ public class adminLoaderMPL implements CommandLineRunner {
                     .email(aesUtil.encrypt(defaultUserId)).address(aesUtil.encrypt(defaultAddress))
                     .phoneNum(aesUtil.encrypt(defaultPhoneNum)).name(defaultName)
                     .password(passwordEncoder.encode(defaultPassword))
-                    .role(Role.ADMIN).build();
+                    .role(Users.Role.ADMIN).build();
             log.info("관리자 계정이 생성되었습니다");
             usersRepository.save(defaultUser);
         } else {

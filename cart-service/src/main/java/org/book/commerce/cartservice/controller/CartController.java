@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.book.commerce.cartservice.dto.AddCartResult;
 import org.book.commerce.cartservice.dto.CartListDto;
 import org.book.commerce.cartservice.service.CartService;
-import org.book.commerce.userservice.domain.CustomUserDetails;
+import org.book.commerce.common.security.CustomUserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

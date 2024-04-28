@@ -1,4 +1,4 @@
-package org.book.commerce.userservice.domain;
+package org.book.commerce.common.security;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -38,4 +38,8 @@ public class Users extends BaseEntity {
     @Column(name="role")
     @Enumerated(EnumType.ORDINAL)
     private Role role;
+
+    public enum Role {
+        USER,ADMIN
+    }
 }
