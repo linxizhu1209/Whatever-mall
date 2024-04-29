@@ -9,7 +9,6 @@ ext {
 
 dependencies {
 	implementation project(':commerce-common')
-	implementation project(':product-service')
 
 	//구글 smtp 사용 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
@@ -30,6 +29,9 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	// redis 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	//openFeign 의존성
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }
 
 dependencyManagement {

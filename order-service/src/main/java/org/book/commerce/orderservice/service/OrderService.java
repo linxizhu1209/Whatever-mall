@@ -1,6 +1,7 @@
 package org.book.commerce.orderservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.book.commerce.cartservice.service.CartService;
 import org.book.commerce.common.entity.ErrorCode;
 import org.book.commerce.common.exception.CommonException;
@@ -12,9 +13,7 @@ import org.book.commerce.common.security.CustomUserDetails;
 import org.book.commerce.orderservice.domain.Order;
 import org.book.commerce.orderservice.domain.OrderStatus;
 import org.book.commerce.orderservice.domain.ProductOrder;
-import org.book.commerce.orderservice.dto.OrderProductListDto;
-import org.book.commerce.orderservice.dto.OrderResultDto;
-import org.book.commerce.orderservice.dto.OrderlistDto;
+import org.book.commerce.orderservice.dto.*;
 import org.book.commerce.orderservice.repository.OrderRepository;
 import org.book.commerce.orderservice.repository.ProductOrderRepository;
 import org.book.commerce.productservice.domain.Product;
@@ -26,29 +25,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final CartService cartService;
-    private final ProductService productService;
     private final ProductOrderRepository productOrderRepository;
+    private final CartOrderFeignClient cartOrderFeignClient;
+    private final OrderProductFeignClient orderProductFeignClient;
+
+    @Transactional
     public OrderResultDto payOrder(CustomUserDetails customUserDetails) {
         String userId = customUserDetails.getUsername();
-        List<Cart> cartList = cartService.findCartList(userId);
+        // todo 회원 email을 넘겨주면 장바구니 목록 불러오도록 (장바구니에는 productId, count 갖고오면됨)
+        List<CartOrderFeignResponse> cartList = cartOrderFeignClient.findCartListByUserEmail(userId);
         Order order = Order.builder().userEmail(userId).status(OrderStatus.ORDER_COMPLETE).build();
         Long orderId = orderRepository.save(order).getOrderId();
-        for(Cart cart:cartList){
-            // 장바구니는 지우고, 주문내역은 생성하고
-            ProductOrder productOrder = ProductOrder.builder().productId(cart.getProductId())
-                    .orderId(orderId).count(cart.getCount()).build();
-            productOrderRepository.save(productOrder);
-            Product product = productService.findProduct(cart.getProductId());
-            int nowStock = product.getStock()-cart.getCount();
-            if(nowStock<0) throw new ConflictException("주문하신 상품의 재고가 부족하여 구매를 할 수 없습니다. 확인해주세요. 상품 번호: "+product.getProductId());
-            product.setStock(product.getStock()-cart.getCount());
-            cartService.deleteCart(cart.getCartId());
-            productService.saveProduct(product);
-        }
+        ArrayList<ProductOrder> productOrders = new ArrayList<>();
+        ArrayList<OrderProductCountFeignRequest> orderProductCountList = new ArrayList<>();
+        for(CartOrderFeignResponse cart:cartList) {
+            ProductOrder productOrder = ProductOrder.builder().productId(cart.productId())
+                    .orderId(orderId).count(cart.count()).build();
+            productOrders.add(productOrder);
+            orderProductCountList.add(new OrderProductCountFeignRequest(cart.productId(), cart.count()));
+        };
+        productOrderRepository.saveAll(productOrders);
+        // 위에까지는 for문으로 돌면됨 cartList를 돌면서 생성 방식. 그치만 save를 한번에 하도록 list에 추가하는 식으로 하기
+        // todo count를 넘겨주면 재고 감소시키도록 (minusStock) => 재고 감소시키고 물품 저장까지
+        orderProductFeignClient.minusStock(orderProductCountList);
+        // 위에까지는 productId랑 count를 넘겨서 재고 감소시키도록 호출. 그런데 한번에 넘길 수 있도록 ..
+        cartOrderFeignClient.deleteAllCart(userId);
+        // 위에는 userEmail 넘기면 그 유저의 장바구니는 다 지워버리도록(장바구니에서 주문이 가능하고, 한번주문할때 장바구니에 들어있는 모든 물품을 주문하는것이므로)
         return new OrderResultDto(orderId);
     }
 
@@ -57,19 +63,22 @@ public class OrderService {
         String userId = customUserDetails.getUsername();
         List<Order> orderList = orderRepository.findAllByUserEmail(userId);
         ArrayList<OrderlistDto> orderlistDtos = new ArrayList<>();
-        for(Order order:orderList){
+        for(Order order:orderList){ // 사용자의 여태까지의 모든 주문내역을 조회하고 그 주문내역하나당 물품을 다 보여줘야함
             List<ProductOrder> productOrderList = productOrderRepository.findAllByOrderId(order.getOrderId());
+            long[] productIdArr = productOrderList.stream().map(ProductOrder::getProductId).mapToLong(i->i).toArray();
+            // product,productprice,productId를 가져와야함
+            List<ProductFeignResponse> productFeignlist = orderProductFeignClient.findProductByProductId(productIdArr);
             List<OrderProductListDto> orderProductListDtos = new ArrayList<>();
-            for(ProductOrder productOrder:productOrderList){
-                Product product = productService.findProduct(productOrder.getProductId());
-                orderProductListDtos.add(OrderProductListDto.builder().productName(product.getName())
-                        .price(product.getPrice()).count(productOrder.getCount()).build());
+            for(ProductFeignResponse product:productFeignlist){
+                int orderCount = productOrderRepository.findByProductIdAndOrderId(product.productId(), order.getOrderId()).getCount();
+                orderProductListDtos.add(OrderProductListDto.builder().productName(product.name())
+                        .price(product.price()).productId(product.productId()).count(orderCount).build());
             }
             orderlistDtos.add(OrderlistDto.builder().orderId(order.getOrderId())
                     .orderStatus(order.getStatus()).orderDate(order.getCreatedAt())
                     .orderProductList(orderProductListDtos).build());
-        } // 이중 for문이라 좋지않음. 그리고 장바구니 - 물품으로 계속 호출해야해서 msa적용하기 쉽지않을거같음
-        // 이중 for문을 없애고 호출을 줄이는 방법을 연구해봐야함
+        }
+        // 이중 for문을 없애는 방법과 호출 줄이는 방법 없을지 고민
         // orderlist에는 간단하게 주문id와 주문날짜, 상태만 보여주고 상세로 들어가야지 주문 아이템 목록을 보여주는 것도 생각
         return orderlistDtos;
     }
@@ -120,10 +129,12 @@ public class OrderService {
 
     private void returnStock(Order order){
         List<ProductOrder> productOrderList = productOrderRepository.findAllByOrderId(order.getOrderId());
-        for(ProductOrder productOrder:productOrderList){
-            Product product = productService.findProduct(productOrder.getProductId());
-            product.setStock(product.getStock()+productOrder.getCount());
-            productService.saveProduct(product);
-        }
+        ArrayList<OrderProductCountFeignRequest> orderProductCountList = new ArrayList<>();
+        for(ProductOrder productOrder:productOrderList) {
+            orderProductCountList.add(new OrderProductCountFeignRequest(productOrder.getProductId(), productOrder.getCount()));
+        };
+        // todo count를 넘겨주면 재고 증가시키도록 (plusStock) => 재고 증가시키고 물품 저장까지
+        orderProductFeignClient.plusStock(orderProductCountList);
+        log.info("재고가 성공적으로 변경되었습니다.");
     }
 }

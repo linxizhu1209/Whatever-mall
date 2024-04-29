@@ -3,6 +3,8 @@ package org.book.commerce.cartservice.service;
 import lombok.RequiredArgsConstructor;
 import org.book.commerce.cartservice.dto.AddCartResult;
 import org.book.commerce.cartservice.dto.CartListDto;
+import org.book.commerce.cartservice.dto.CartOrderFeignResponse;
+import org.book.commerce.cartservice.dto.CartProductFeignResponse;
 import org.book.commerce.cartservice.repository.CartRepository;
 import org.book.commerce.common.exception.ConflictException;
 import org.book.commerce.cartservice.domain.Cart;
@@ -11,6 +13,7 @@ import org.book.commerce.common.security.CustomUserDetails;
 import org.book.commerce.productservice.domain.Product;
 import org.book.commerce.productservice.service.ProductService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.ArrayList;
@@ -21,7 +24,8 @@ import java.util.List;
 public class CartService {
 
     private final CartRepository cartRepository;
-    private final ProductService productService;
+    private final CartProductFeignClient cartProductFeignClient;
+
     public AddCartResult addCart(CustomUserDetails customUserDetails, Long productId, int count) {
         if(cartRepository.existsByUserEmailAndProductId(customUserDetails.getUsername(),productId)){
             throw new ConflictException("이미 장바구니에 있는 제품입니다.");
@@ -47,17 +51,29 @@ public class CartService {
     public List<CartListDto> getCartList(CustomUserDetails customUserDetails) {
         String email = customUserDetails.getUsername();
         List<Cart> cartList = cartRepository.findAllByUserEmail(email);
+        long[] productIdList = cartList.stream().map(Cart::getProductId).mapToLong(i->i).toArray();
+        List<CartProductFeignResponse> cartProductFeignResponses = cartProductFeignClient.findCartProductByProductId(productIdList);
         List<CartListDto> cartListDtos = new ArrayList<>();
-        for(Cart cart:cartList){
-            Product product = productService.findProduct(cart.getProductId());
-            cartListDtos.add(CartListDto.builder().productName(product.getName())
-                    .productId(product.getProductId()).price(product.getPrice())
+        for(CartProductFeignResponse product:cartProductFeignResponses){
+            Cart cart = cartRepository.findByUserEmailAndProductId(email, product.productId());
+            cartListDtos.add(CartListDto.builder().productName(product.name())
+                    .productId(product.productId()).price(product.price())
                     .count(cart.getCount()).build());
         }
         return cartListDtos;
     }
 
-    public List<Cart> findCartList(String userId) {
-        return cartRepository.findAllByUserEmail(userId);
+    public List<CartOrderFeignResponse> findCartList(String userId) {
+        List<Cart> cartList = cartRepository.findAllByUserEmail(userId);
+        ArrayList<CartOrderFeignResponse> cartOrderlist = new ArrayList<>();
+        for(Cart cart:cartList){
+            cartOrderlist.add(new CartOrderFeignResponse(cart.getProductId(),cart.getCount(),cart.getCartId()));
+        }
+        return cartOrderlist;
+    }
+
+    @Transactional
+    public void deleteAllCart(String userEmail) {
+        cartRepository.deleteAllByUserEmail(userEmail);
     }
 }

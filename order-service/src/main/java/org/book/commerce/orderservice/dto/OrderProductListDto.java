@@ -15,5 +15,7 @@ public class OrderProductListDto {
     private String productName;
     @Schema(description = "물품가격",example = "15000")
     private long price;
+    @Schema(description = "물품고유번호",example = "1")
+    private Long productId;
 
 }

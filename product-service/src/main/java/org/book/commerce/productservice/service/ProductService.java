@@ -1,6 +1,7 @@
 package org.book.commerce.productservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.book.commerce.common.exception.ConflictException;
 import org.book.commerce.common.exception.NotFoundException;
 import org.book.commerce.productservice.dto.*;
 import org.book.commerce.productservice.repository.ImageRepository;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -69,12 +71,50 @@ public class ProductService {
         return ResponseEntity.status(HttpStatus.OK).body("상품 수정이 완료되었습니다.");
     }
 
-    public Product findProduct(Long productId){
-        return productRepository.findById(productId).orElseThrow(()->new NotFoundException("존재하지 않는 물품입니다."));
+    public List<ProductFeignResponse> findProduct(long[] productIdList){
+        ArrayList<ProductFeignResponse> productList = new ArrayList<>();
+        for(Long productId:productIdList) {
+            Product product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("존재하지 않는 물품입니다."));
+            productList.add(new ProductFeignResponse(product.getProductId(),product.getName(),product.getPrice(), product.getThumbnailUrl(),product.getThumbnailName()));
+        }
+        return productList;
     }
 
     public void saveProduct(Product product){
         productRepository.save(product);
     }
 
+    public List<CartProductFeignResponse> findCartProduct(long[] productIdList) {
+        ArrayList<CartProductFeignResponse> productList = new ArrayList<>();
+        for(Long productId:productIdList) {
+            Product product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("존재하지 않는 물품입니다."));
+            productList.add(new CartProductFeignResponse(product.getProductId(),product.getName(),product.getPrice()));
+        }
+        return productList;
+    }
+
+    public void minusStock(ArrayList<OrderProductCountFeignRequest> orderProductCount) {
+        ArrayList<Product> products = new ArrayList<>();
+        for(OrderProductCountFeignRequest orderProduct:orderProductCount){
+            // todo product찾아오는 로직 통합예정
+            Product product = productRepository.findById(orderProduct.productId()).orElseThrow();
+            int changedStock = product.getStock()-orderProduct.count();
+            if(changedStock<0) throw new ConflictException("주문하신 상품의 재고가 부족하여 구매를 할 수 없습니다. 확인해주세요. 상품 번호: "+product.getProductId());
+            product.setStock(changedStock);
+            products.add(product);
+        }
+        productRepository.saveAll(products);
+    }
+
+    public void plusStock(ArrayList<OrderProductCountFeignRequest> orderProductCount) {
+        ArrayList<Product> products = new ArrayList<>();
+        for(OrderProductCountFeignRequest orderProduct:orderProductCount){
+            // todo product찾아오는 로직 통합예정
+            Product product = productRepository.findById(orderProduct.productId()).orElseThrow();
+            int changedStock = product.getStock()+orderProduct.count();
+            product.setStock(changedStock);
+            products.add(product);
+        }
+        productRepository.saveAll(products);
+    }
 }

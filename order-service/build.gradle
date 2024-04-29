@@ -11,8 +11,6 @@ ext {
 
 dependencies {
 	implementation project(':commerce-common')
-	implementation project(':product-service')
-	implementation project(':cart-service')
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -25,6 +23,7 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	// redis 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }
 
 dependencyManagement {
