@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.book.commerce.common.exception.CommonException;
 import org.book.commerce.productservice.dto.*;
 import org.book.commerce.productservice.service.ProductService;
 import org.springframework.http.HttpStatus;
@@ -55,7 +56,8 @@ public class ProductController {
     @GetMapping("/cartProduct")
     public List<CartProductFeignResponse> findCartProductByProductId(@RequestParam("productId") final long[] productIdList){
         log.info("[Cart->Product] open feign 통신이 성공하였습니다");
-        return productService.findCartProduct(productIdList);
+        throw new CommonException("실패!!!!!!!");
+//        return productService.findCartProduct(productIdList);
     }
 
     @PutMapping("/minusStock")

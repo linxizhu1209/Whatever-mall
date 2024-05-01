@@ -6,12 +6,12 @@ import org.book.commerce.cartservice.dto.CartListDto;
 import org.book.commerce.cartservice.dto.CartOrderFeignResponse;
 import org.book.commerce.cartservice.dto.CartProductFeignResponse;
 import org.book.commerce.cartservice.repository.CartRepository;
-import org.book.commerce.common.exception.ConflictException;
+
 import org.book.commerce.cartservice.domain.Cart;
+
+import org.book.commerce.common.exception.ConflictException;
 import org.book.commerce.common.exception.NotFoundException;
 import org.book.commerce.common.security.CustomUserDetails;
-import org.book.commerce.productservice.domain.Product;
-import org.book.commerce.productservice.service.ProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

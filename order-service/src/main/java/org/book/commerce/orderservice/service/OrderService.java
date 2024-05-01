@@ -2,13 +2,10 @@ package org.book.commerce.orderservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.book.commerce.cartservice.service.CartService;
 import org.book.commerce.common.entity.ErrorCode;
 import org.book.commerce.common.exception.CommonException;
-import org.book.commerce.common.exception.ConflictException;
 import org.book.commerce.common.exception.NotAcceptException;
 import org.book.commerce.common.exception.NotFoundException;
-import org.book.commerce.cartservice.domain.Cart;
 import org.book.commerce.common.security.CustomUserDetails;
 import org.book.commerce.orderservice.domain.Order;
 import org.book.commerce.orderservice.domain.OrderStatus;
@@ -16,8 +13,6 @@ import org.book.commerce.orderservice.domain.ProductOrder;
 import org.book.commerce.orderservice.dto.*;
 import org.book.commerce.orderservice.repository.OrderRepository;
 import org.book.commerce.orderservice.repository.ProductOrderRepository;
-import org.book.commerce.productservice.domain.Product;
-import org.book.commerce.productservice.service.ProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

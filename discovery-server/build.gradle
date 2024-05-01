@@ -9,6 +9,14 @@ dependencies {
 
 }
 
+bootJar {
+    enabled = true
+    mainClass = "org.book.commerce.discoveryserver.DiscoveryServerApplication"
+}
+jar {
+    enabled = false
+}
+
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"

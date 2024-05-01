@@ -1,5 +1,6 @@
 package org.book.commerce.orderservice.service;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.book.commerce.orderservice.dto.OrderProductCountFeignRequest;
 import org.book.commerce.orderservice.dto.ProductFeignResponse;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.ArrayList;
 import java.util.List;
 
+@CircuitBreaker(name="circuit")
 @FeignClient(name="application-product", path = "/product")
 public interface OrderProductFeignClient {
     @PutMapping("/minusStock")

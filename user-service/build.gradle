@@ -32,6 +32,9 @@ dependencies {
 
 	//openFeign 의존성
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+
+
 }
 
 dependencyManagement {
@@ -39,6 +42,15 @@ dependencyManagement {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
 }
+
+bootJar {
+	enabled = true
+	mainClass = "org.book.commerce.userservice.UserServiceApplication"
+}
+jar {
+	enabled = false
+}
+
 
 tasks.named('test') {
 	useJUnitPlatform()

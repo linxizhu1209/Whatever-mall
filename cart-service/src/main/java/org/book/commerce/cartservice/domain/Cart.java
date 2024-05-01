@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.book.commerce.common.entity.BaseEntity;
 
+
 @Entity
 @AllArgsConstructor
 @Builder

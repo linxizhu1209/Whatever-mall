@@ -32,6 +32,14 @@ dependencyManagement {
 	}
 }
 
+bootJar {
+	enabled = true
+	mainClass = "org.book.commerce.productservice.ProductServiceApplication"
+}
+jar {
+	enabled = false
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }

@@ -8,6 +8,14 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
 }
 
+bootJar {
+    enabled = true
+    mainClass = "org.configserver.ConfigServerApplication"
+}
+jar {
+    enabled = false
+}
+
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"

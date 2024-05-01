@@ -10,6 +10,9 @@ spring:
         git:
           uri: https://github.com/linxizhu1209/config-repo
           default-label: master
+        bootstrap: true
+encrypt:
+  key: ${ENCRYPT_KEY}
 management:
   endpoints:
     web:

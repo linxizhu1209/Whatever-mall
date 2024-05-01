@@ -1,0 +1,163 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:latest
+    container_name: ecommerce-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: ecommerce
+      MYSQL_USER: heeju
+      MYSQL_PASSWORD: 1234
+      TZ: 'Asia/Seoul'
+    ports:
+      - "3307:3306"
+    networks:
+      - commerce-network
+  redis:
+    image: redis:latest
+    container_name: ecommerce_redis
+    restart: always
+    ports:
+      - "6380:6379"
+    networks:
+      - commerce-network
+    environment:
+      TZ: 'Asia/Seoul'
+
+
+
+  config-server:
+    image: config-server:latest
+    restart: on-failure
+    ports:
+      - "8081:8081"
+    networks:
+      - commerce-network
+    environment:
+      SPRING_APPLICATION_NAME: config-server
+      SPRING_CONFIG_LOCATION: /application.yml
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/linxizhu1209/config-repo
+      SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT-LABEL: master
+      SPRING_CLOUD_CONFIG_SERVER_GIT_BOOTSTRAP: true
+#    volumes:
+#      - /config-server/src/main/resources/:/app/
+  discovery-server:
+    image: discovery-server:latest
+    ports:
+      - 8761:8761
+    depends_on:
+      - config-server
+    environment:
+      SPRING_APPLICATION_NAME: discovery-server
+      SPRING_CONFIG_LOCATION: /application.yml
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://config-server:8081/"
+      spring.config.import: "optional:configserver:http://config-server:8081/"
+      CONFIG_SERVER_URI: "http://config-server:8081"
+    networks:
+      - commerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://discovery-server:8761/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+  common-server:
+    image: common-server:latest
+    ports:
+      - 8020:8020
+    networks:
+      - commerce-network
+    environment:
+      DISCOVERY_SERVER_URL: http://discovery-server:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:mysql://ecommerce-mysql:3306/ecommerce?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_CONFIG_LOCATION: /application.yml
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://application-common:8020/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    restart: on-failure
+
+  user-server:
+    image: user-server:latest
+    ports:
+      - 8014:8014
+    networks:
+      - commerce-network
+    environment:
+      SPRING_CONFIG_LOCATION: /application.yml
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://application-user:8014/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    restart: on-failure
+
+  product-server:
+    image: product-server:latest
+    ports:
+      - 8013:8013
+    networks:
+      - commerce-network
+    environment:
+      SPRING_CONFIG_LOCATION: /application.yml
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://application-product:8013/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    restart: on-failure
+
+  cart-server:
+    image: cart-server:latest
+    ports:
+      - 8011:8011
+    networks:
+      - commerce-network
+    environment:
+      SPRING_CONFIG_LOCATION: /application.yml
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://application-cart:8011/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    restart: on-failure
+
+  order-server:
+    image: order-server:latest
+    ports:
+      - 8012:8012
+    networks:
+      - commerce-network
+    environment:
+      SPRING_CONFIG_LOCATION: /application.yml
+#    environment:
+#      - DISCOVERY_SERVER_URL=http://discovery-server:8761/eureka/
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://application-order:8012/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    restart: on-failure
+networks:
+  commerce-network:
+
+
+
+

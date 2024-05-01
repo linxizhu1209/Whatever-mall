@@ -21,7 +21,10 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	// redis 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
 }
 
 dependencyManagement {
@@ -29,6 +32,15 @@ dependencyManagement {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
 }
+
+bootJar {
+	enabled = true
+	mainClass = "org.book.commerce.cartservice.CartServiceApplication"
+}
+jar {
+	enabled = false
+}
+
 
 tasks.named('test') {
 	useJUnitPlatform()
