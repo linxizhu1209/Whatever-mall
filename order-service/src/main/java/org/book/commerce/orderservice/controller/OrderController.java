@@ -3,9 +3,12 @@ package org.book.commerce.orderservice.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.book.commerce.orderservice.dto.ReqBuyProduct;
 import org.book.commerce.common.security.CustomUserDetails;
 import org.book.commerce.orderservice.dto.OrderResultDto;
 import org.book.commerce.orderservice.dto.OrderlistDto;
+import org.book.commerce.orderservice.dto.PayInfo;
 import org.book.commerce.orderservice.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,17 +19,36 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @Tag(name="주문 API",description = "장바구니에 담긴 물품을 주문하고, 취소, 반품, 조회할 수 있는 API입니다")
 @RequestMapping("/order")
 public class OrderController {
     private final OrderService orderService;
     //todo 1.상품 주문하기 => 장바구니에 있는 상품 주문, 장바구니에 있는 상품 삭제
-    @Operation(summary = "장바구니 물품 주문",description = "장바구니에 담긴 물품들을 주문한다(장바구니를 통해서만 주문 가능")
-    @PostMapping("/pay")
-    public ResponseEntity payOrder(@AuthenticationPrincipal CustomUserDetails customUserDetails){
-        OrderResultDto orderResultDto = orderService.payOrder(customUserDetails);
+    @Operation(summary = "장바구니 물품 주문", description = "장바구니에서 바로 주문을 한다")
+    @PostMapping("/orderCartList")
+    public ResponseEntity<OrderResultDto> orderCartList(@AuthenticationPrincipal CustomUserDetails customUserDetails){
+        OrderResultDto orderResultDto = orderService.orderCartList(customUserDetails);
         return ResponseEntity.status(HttpStatus.OK).body(orderResultDto);
-    } // todo 주문했을때 재고가 없다면, 또는 재고가 한정적인데 여러명이 몰렸다면 동시성 이슈를 생각해봐야함
+    }
+
+    @Operation(summary = "상세페이지 물품 주문", description = "상세페이지에서 바로 주문을 한다")
+    @PostMapping("/orderProduct")
+    public ResponseEntity<OrderResultDto> orderProduct(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                          @RequestBody ReqBuyProduct reqBuyProduct){
+            OrderResultDto orderResultDto = orderService.orderProduct(customUserDetails,reqBuyProduct);
+            return ResponseEntity.status(HttpStatus.OK).body(orderResultDto);
+    }
+
+    @Operation(summary = "주문 건 결제 요청", description = "주문한 제품을 결제한다")
+    @PutMapping("/payOrder/{orderId}")
+    public ResponseEntity payOrder(@PathVariable Long orderId,
+                                   @RequestBody PayInfo payInfo){
+            log.info("[OrderService] 주문 결제 요청이 들어왔습니다. 주문번호 = "+orderId);
+            orderService.payOrder(orderId,payInfo);
+            return ResponseEntity.status(HttpStatus.OK).body("주문한 건에 대해 결제가 완료되었습니다!");
+    }
+
 
     @Operation(summary = "나의 주문이력 조회",description = "나의 주문이력을 조회한다(주문번호,주문일자,주문상태 조회 가능")
     @GetMapping("/orderlist")

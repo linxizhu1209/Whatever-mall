@@ -16,12 +16,16 @@ import java.util.List;
 @CircuitBreaker(name="circuit")
 @FeignClient(name="application-product", path = "/product")
 public interface OrderProductFeignClient {
-    @PutMapping("/minusStock")
-    ResponseEntity minusStock(@RequestBody ArrayList<OrderProductCountFeignRequest> orderProductCount);
+    @PutMapping("/minusStockList")
+    ResponseEntity minusStockList(@RequestBody ArrayList<OrderProductCountFeignRequest> orderProductCount);
 
     @PutMapping("/plusStock")
     ResponseEntity plusStock(@RequestBody ArrayList<OrderProductCountFeignRequest> orderProductCount);
     @GetMapping()
     List<ProductFeignResponse> findProductByProductId(@RequestParam("productId") final long[] productIdList);
+
+    @PutMapping("/minusStock")
+    ResponseEntity minusStock(@RequestBody OrderProductCountFeignRequest orderProductCountFeignRequest);
+
 
 }
