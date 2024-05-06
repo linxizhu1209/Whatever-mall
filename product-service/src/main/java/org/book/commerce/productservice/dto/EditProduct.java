@@ -15,4 +15,6 @@ public class EditProduct {
     private long price;
     @Schema(description = "상품설명",example = "이 책은 남녀노소어린아이어른할것없이 좋아합니다")
     private String description;
+    @Schema(description = "재고",example = "300")
+    private int stock;
 }

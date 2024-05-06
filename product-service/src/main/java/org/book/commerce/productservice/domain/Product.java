@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.book.commerce.common.entity.BaseEntity;
 
+import java.time.LocalDateTime;
+
 
 @Entity
 @AllArgsConstructor
@@ -35,5 +37,11 @@ public class Product extends BaseEntity {
 
     @Column(name="thumbnail_name")
     private String thumbnailName; // todo 이미지 엔티티에 대표여부를 넣는게 더 나은지는 생각해볼것
+
+    @Column(name="isLimitedEdition")
+    private Boolean isLimitedEdition;
+
+    @Column(name="open_time")
+    private LocalDateTime openDateTime; // todo 이후에 timeUtil 형식으로 저장되게 변경 예정
 
 }

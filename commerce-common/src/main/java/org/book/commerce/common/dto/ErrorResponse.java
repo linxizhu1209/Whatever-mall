@@ -17,11 +17,10 @@ public class ErrorResponse {
         CommonException ex = (CommonException)e;
         this.code = ex.getErrCode();
         this.status = ex.getStatus();
-        this.message = ex.getMessage();
+        this.message = ex.getErrMsg();
     }
 
     public ResponseEntity build(){
-        ResponseEntity responseEntity = new ResponseEntity<>(this,status);
-        return responseEntity;
+        return new ResponseEntity<>(this,status);
     }
 }

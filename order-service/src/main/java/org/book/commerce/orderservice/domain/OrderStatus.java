@@ -7,7 +7,9 @@ public enum OrderStatus {
     SHIPPING("배송중"),
     FINISH_SHIPPING("배송완료"),
     REQ_REFUND("반품신청"),
-    FINISH_REFUND("반품완료");
+    FINISH_REFUND("반품완료"),
+    WAITING_PAYING("결제대기");
+
 
 
     private final String status;

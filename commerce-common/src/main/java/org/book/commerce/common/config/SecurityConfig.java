@@ -28,7 +28,7 @@ public class SecurityConfig {
             ,"/eureka"
     };
     private final String[] USER_URL = {
-            "/user/**", "auth/logout","/cart/**"
+            "/user/**", "auth/logout","/cart/**","/order/**"
     };
     private final String[] ADMIN_URL = {
             "/admin/**", "/product/admin/**"

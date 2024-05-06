@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDateTime;
 
 @Builder
 @Setter
@@ -20,5 +23,6 @@ public class AllProductList {
     private String imgUrl;
     @Schema(description = "대표이미지이름",example = "장화신은고양이다")
     private String imgName;
+
 
 }

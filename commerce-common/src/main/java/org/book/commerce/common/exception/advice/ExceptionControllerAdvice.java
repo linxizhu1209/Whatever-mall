@@ -37,9 +37,9 @@ public class ExceptionControllerAdvice {
 
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(ConflictException.class)
-    public String handleConflictException(ConflictException ce){
+    public ResponseEntity handleConflictException(ConflictException ce){
         log.error("Client 요청이 충돌되어 다음처럼 출력합니다"+ce.getMessage());
-        return ce.getMessage();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ce.getMessage());
     }
 
     @ExceptionHandler(CommonException.class)

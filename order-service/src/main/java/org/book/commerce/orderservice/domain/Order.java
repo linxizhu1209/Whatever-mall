@@ -24,5 +24,6 @@ public class Order extends BaseEntity {
 
     @Column(name="user_email")
     private String userEmail;
+
 }
 

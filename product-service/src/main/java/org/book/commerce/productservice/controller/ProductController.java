@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.book.commerce.common.exception.CommonException;
 import org.book.commerce.productservice.dto.*;
 import org.book.commerce.productservice.service.ProductService;
+import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @Slf4j
-@Tag(name="물품 API",description = "물품을 조회할 수 있는 API입니다")
+@Tag(name="물품 API",description = "물품을 조회하고 등록할 수 있는 API입니다")
 @RequestMapping("/product")
 public class ProductController {
 
@@ -40,6 +41,12 @@ public class ProductController {
     public ResponseEntity<ProductDetail> getProductDetail(@PathVariable Long productId){
         return productService.getProductDetail(productId);
     }
+    @GetMapping("/detailStock/{productId}")
+    @Operation(summary = "물품의 재고 상세조회",description = "물품 구매전 물품의 재고를 확인할 수 있는 창입니다")
+    public ResponseEntity<ProductStockDetail> getStockDetail(@PathVariable Long productId){
+        ProductStockDetail productStockDetail = productService.getProductStock(productId);
+        return ResponseEntity.status(HttpStatus.OK).body(productStockDetail);
+    }
 
     @PutMapping("/admin/edit/{productId}")
     @Operation(summary = "관리자의 물품 수정",description = "관리자가 물품의 정보를 수정한다")
@@ -56,14 +63,14 @@ public class ProductController {
     @GetMapping("/cartProduct")
     public List<CartProductFeignResponse> findCartProductByProductId(@RequestParam("productId") final long[] productIdList){
         log.info("[Cart->Product] open feign 통신이 성공하였습니다");
-        throw new CommonException("실패!!!!!!!");
-//        return productService.findCartProduct(productIdList);
+//        throw new CommonException("실패!!!!!!!");
+        return productService.findCartProduct(productIdList);
     }
 
-    @PutMapping("/minusStock")
-    public ResponseEntity minusStock(@RequestBody ArrayList<OrderProductCountFeignRequest> orderProductCount){
+    @PutMapping("/minusStockList")
+    public ResponseEntity minusStockList(@RequestBody ArrayList<OrderProductCountFeignRequest> orderProductCount){
         log.info("[Order->Product] open feign 통신이 성공하였습니다");
-        productService.minusStock(orderProductCount);
+        productService.minusStockList(orderProductCount);
         return ResponseEntity.status(HttpStatus.OK).body("재고가 성공적으로 변경되었습니다!");
     }
 
@@ -73,4 +80,13 @@ public class ProductController {
         productService.plusStock(orderProductCount);
         return ResponseEntity.status(HttpStatus.OK).body("재고가 성공적으로 변경되었습니다!");
     }
+
+    @PutMapping("/minusStock")
+    public ResponseEntity minusStock(@RequestBody OrderProductCountFeignRequest orderProductCountFeignRequest){
+        log.info("[Order->Product] open feign 통신이 성공하였습니다");
+        ProductStockDetail productStockDetail = productService.minusStock(orderProductCountFeignRequest);
+        return ResponseEntity.status(HttpStatus.OK).body("재고가 성공적으로 변경되었습니다.");
+    }
+
+
 }
