@@ -1,7 +1,9 @@
 server:
   port: 8013
 spring:
+  cache:
+    type: redis
   application:
     name: application-product
   config:
-    import: "optional:configserver:http://config-server:8081/"
+    import: "optional:configserver:http://localhost:8081/"

@@ -24,6 +24,9 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	// redis 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	//redisson 의존성
+	implementation 'org.redisson:redisson-spring-boot-starter:3.18.0'
 }
 
 dependencyManagement {
@@ -40,6 +43,17 @@ jar {
 	enabled = false
 }
 
+tasks.named('compileJava').configure {
+	options.compilerArgs = ['-parameters']
+}
+
+
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) { options.compilerArgs.add("-parameters") }
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs << '-parameters'
 }

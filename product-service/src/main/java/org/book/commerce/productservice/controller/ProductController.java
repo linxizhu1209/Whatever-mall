@@ -26,8 +26,9 @@ public class ProductController {
     private final ProductService productService;
     @PostMapping("/admin/add")//,consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "관리자의 물품 등록",description = "관리자가 묾품을 등록한다")
-    public ResponseEntity addProduct(@Valid @RequestBody AddProductDto addProductDto){ //@RequestPart(name="productImage", required = false) MultipartFile productImages)     {
-        return productService.addProduct(addProductDto);
+    public ResponseEntity<String> addProduct(@Valid @RequestBody AddProductDto addProductDto){ //@RequestPart(name="productImage", required = false) MultipartFile productImages)     {
+        productService.addProduct(addProductDto);
+        return ResponseEntity.status(HttpStatus.OK).body("상품 추가가 완료되었습니다!");
     }
 
     @GetMapping("/allproduct")
@@ -50,8 +51,9 @@ public class ProductController {
 
     @PutMapping("/admin/edit/{productId}")
     @Operation(summary = "관리자의 물품 수정",description = "관리자가 물품의 정보를 수정한다")
-    public ResponseEntity editProdcut(@PathVariable Long productId,@RequestBody EditProduct editProduct){
-        return productService.editProduct(productId,editProduct);
+    public ResponseEntity<String> editProdcut(@PathVariable Long productId,@RequestBody EditProduct editProduct){
+        productService.editProduct(productId,editProduct);
+        return ResponseEntity.status(HttpStatus.OK).body("상품 수정이 완료되었습니다.");
     }
 
     @GetMapping()
@@ -68,23 +70,30 @@ public class ProductController {
     }
 
     @PutMapping("/minusStockList")
-    public ResponseEntity minusStockList(@RequestBody ArrayList<OrderProductCountFeignRequest> orderProductCount){
+    public ResponseEntity<String> minusStockList(@RequestBody ArrayList<OrderProductCountFeignRequest> orderProductCount){
         log.info("[Order->Product] open feign 통신이 성공하였습니다");
         productService.minusStockList(orderProductCount);
         return ResponseEntity.status(HttpStatus.OK).body("재고가 성공적으로 변경되었습니다!");
     }
 
-    @PutMapping("/plusStock")
-    public ResponseEntity plusStock(@RequestBody ArrayList<OrderProductCountFeignRequest> orderProductCount){
+    @PutMapping("/plusStockList")
+    public ResponseEntity<String> plusStockList(@RequestBody ArrayList<OrderProductCountFeignRequest> orderProductCount){
         log.info("[Order->Product] open feign 통신이 성공하였습니다");
-        productService.plusStock(orderProductCount);
+        productService.plusStockList(orderProductCount);
         return ResponseEntity.status(HttpStatus.OK).body("재고가 성공적으로 변경되었습니다!");
     }
 
-    @PutMapping("/minusStock")
-    public ResponseEntity minusStock(@RequestBody OrderProductCountFeignRequest orderProductCountFeignRequest){
+    @PutMapping("/minusStock/{productId}")
+    public ResponseEntity<String> minusStock(@PathVariable Long productId, @RequestBody OrderProductCountFeignRequest orderProductCountFeignRequest){
         log.info("[Order->Product] open feign 통신이 성공하였습니다");
-        ProductStockDetail productStockDetail = productService.minusStock(orderProductCountFeignRequest);
+        productService.minusStock(String.valueOf(productId),orderProductCountFeignRequest);
+        return ResponseEntity.status(HttpStatus.OK).body("재고가 성공적으로 변경되었습니다.");
+    }
+
+    @PutMapping("/plusStock/{productId}")
+    public ResponseEntity<String> plusStock(@PathVariable Long productId, @RequestBody OrderProductCountFeignRequest orderProductCountFeignRequest){
+        log.info("[Order->Product] open feign 통신이 성공하였습니다");
+        productService.plusStock(String.valueOf(productId),orderProductCountFeignRequest);
         return ResponseEntity.status(HttpStatus.OK).body("재고가 성공적으로 변경되었습니다.");
     }
 
