@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductStockDetail implements Serializable {
+public class ProductStockDetail {
     private Long productId;
     private String productName;
     private int stock;
