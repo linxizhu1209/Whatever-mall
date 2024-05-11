@@ -27,8 +27,7 @@ public class DistributedLockAop {
     private final AopForTransaction aopForTransaction;
 
     @Around("@annotation(org.book.commerce.productservice.config.DistributedLock)")
-    public Object
-    lock(final ProceedingJoinPoint joinPoint) throws Throwable{
+    public Object lock(final ProceedingJoinPoint joinPoint) throws Throwable{
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         DistributedLock distributedLock = method.getAnnotation(DistributedLock.class);
