@@ -123,16 +123,15 @@ public class ProductService {
     }
 
     @Transactional
-//    @DistributedLock(key = "#productId")
+    @DistributedLock(key = "#productId")
     @Cacheable(value = "productStockCache",key = "#productId",cacheManager = "redisCacheManager")
     public ProductStockDetail getProductStock(Long productId) {
         Product product = findProductById(productId);
         return new ProductStockDetail(product.getProductId(), product.getName(), product.getStock(),false);
-        // todo 누군가가 결제프로세스에 들어가서 재고가 감소하는 쓰레드가 진행중이라면, 재고 조회를 하지 못해야함
     }
 
     private Product findProductById(Long productId) {
-        return productRepository.findById(productId).orElseThrow(() -> new NotFoundException("존재하지 않는 물품입니다."));
+        return productRepository.findByIdWithPessimisticLock(productId).orElseThrow(() -> new NotFoundException("존재하지 않는 물품입니다."));
     }
 
 
@@ -283,8 +282,8 @@ public class ProductService {
      * write-through 전략 사용한 로직
      */
 //    @Transactional
-//    @DistributedLock(key = "#productId")
-//    @CachePut(value = "productStockCache",key = "#orderProduct.productId", cacheManager = "redisCacheManager")
+////    @DistributedLock(key = "#productId")
+////    @CachePut(value = "productStockCache",key = "#orderProduct.productId", cacheManager = "redisCacheManager")
 //    public ProductStockDetail minusStock(String productId, OrderProductCountFeignRequest orderProduct) {
 //        Product product = findProductById(orderProduct.productId());
 //        int changedStock = product.getStock() - orderProduct.count();
@@ -296,10 +295,10 @@ public class ProductService {
 //                .productName(product.getName()).modified(true).stock(changedStock).build();
 //    }
 //
-
+//
 //    @Transactional
-//    @DistributedLock(key = "#productId")
-//    @CachePut(value = "productStockCache",key = "#orderProduct.productId", cacheManager = "redisCacheManager")
+////    @DistributedLock(key = "#productId")
+////    @CachePut(value = "productStockCache",key = "#orderProduct.productId", cacheManager = "redisCacheManager")
 //    public ProductStockDetail plusStock(String productId, OrderProductCountFeignRequest orderProduct) {
 //        Product product = findProductById(orderProduct.productId());
 //        int changedStock = product.getStock() + orderProduct.count();

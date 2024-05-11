@@ -13,10 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableCaching
 public class ProductServiceApplication {
-
 	public static void main(String[] args) {
-//		System.setProperty("spring.config.name","application.yml,application.yml");
 		SpringApplication.run(org.book.commerce.productservice.ProductServiceApplication.class, args);
 	}
-
 }
