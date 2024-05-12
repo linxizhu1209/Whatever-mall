@@ -5,18 +5,18 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.book.commerce.common.config.JwtTokenProvider;
 import org.book.commerce.common.dto.CommonResponseDto;
 import org.book.commerce.common.entity.ErrorCode;
 import org.book.commerce.common.exception.CommonException;
 import org.book.commerce.common.exception.ConflictException;
 import org.book.commerce.common.exception.NotFoundException;
-import org.book.commerce.common.security.Users;
-import org.book.commerce.common.security.UsersRepository;
 import org.book.commerce.common.util.AESUtil;
 import org.book.commerce.common.util.RedisUtil;
+import org.book.commerce.userservice.config.JwtTokenProvider;
+import org.book.commerce.userservice.domain.Users;
 import org.book.commerce.userservice.dto.LoginInfo;
 import org.book.commerce.userservice.dto.SignupInfo;
+import org.book.commerce.userservice.repository.UsersRepository;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -123,8 +123,6 @@ public class AuthService {
             response.put("access_token",accessToken);
             response.put("roles",user.getRole().toString());
             return ResponseEntity.ok(response);
-
-
     }
 
     private UsernamePasswordAuthenticationToken toAuthentication(String email,String pwd) {

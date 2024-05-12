@@ -1,5 +1,6 @@
-package org.book.commerce.common.security;
+package org.book.commerce.userservice.repository;
 
+import org.book.commerce.userservice.domain.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

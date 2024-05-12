@@ -3,12 +3,10 @@ package org.book.commerce.userservice.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.book.commerce.common.security.CustomUserDetails;
 import org.book.commerce.userservice.dto.MyPageDto;
 import org.book.commerce.userservice.dto.UpdateInfo;
 import org.book.commerce.userservice.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,14 +20,14 @@ public class UserController {
     // todo 마이페이지 구현
     @Operation(summary = "마이페이지 조회",description = "회원이 마이페이지 조회를 할 수 있다")
     @GetMapping("/mypage")
-    public ResponseEntity<MyPageDto> mypage(@AuthenticationPrincipal CustomUserDetails customUserDetails){
-        return userService.getMypage(customUserDetails.getUsername());
+    public ResponseEntity<MyPageDto> mypage(@RequestHeader("X-Authorization-Id") String userEmail){
+        return userService.getMypage(userEmail);
     }
 
     @Operation(summary = "마이페이지 수정",description = "회원이 마이페이지의 정보를 수정할 수 있다")
     @PutMapping("/mypage/update")
-    public ResponseEntity updateMypage(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Validated @RequestBody UpdateInfo updateInfo){
-        return userService.updateMyPage(customUserDetails.getUsername(),updateInfo);
+    public ResponseEntity updateMypage(@RequestHeader("X-Authorization-Id") String userEmail, @Validated @RequestBody UpdateInfo updateInfo){
+        return userService.updateMyPage(userEmail,updateInfo);
     }
 
 }

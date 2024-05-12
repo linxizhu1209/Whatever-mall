@@ -2,11 +2,11 @@ package org.book.commerce.userservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.book.commerce.common.exception.NotFoundException;
-import org.book.commerce.common.security.Users;
-import org.book.commerce.common.security.UsersRepository;
 import org.book.commerce.common.util.AESUtil;
+import org.book.commerce.userservice.domain.Users;
 import org.book.commerce.userservice.dto.MyPageDto;
 import org.book.commerce.userservice.dto.UpdateInfo;
+import org.book.commerce.userservice.repository.UsersRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;

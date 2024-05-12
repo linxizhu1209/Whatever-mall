@@ -31,14 +31,14 @@ public class AuthController {
 
     @Operation(summary = "회원가입",description = "이메일 인증을 통해 회원가입할 수 있다")
     @PostMapping("/signup")
-    public CommonResponseDto signup(@Valid @RequestBody SignupInfo signupInfo) throws Exception {
+    public CommonResponseDto signup(@RequestBody SignupInfo signupInfo){
         log.info("회원 가입 요청이 들어왔습니다");
         return authService.signup(signupInfo);
     }
 
     @Operation(summary = "이메일 인증",description = "이메일 인증을 통해 회원가입을 완료한다(회원 권한 부여)")
     @GetMapping("/signup/email-verifications")
-    public String signupConfirm(@RequestParam("key") String key, HttpServletResponse response) throws TimeoutException {
+    public String signupConfirm(@RequestParam("key") String key, HttpServletResponse response){
         authService.registerUser(key);
         return "회원인증이 성공하였습니다";
     }
@@ -47,7 +47,7 @@ public class AuthController {
 
     @Operation(summary = "로그인",description = "로그인이 성공하면 회원에게 토큰을 발급한다")
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginInfo loginInfo, HttpServletResponse httpServletResponse) throws Exception {
+    public ResponseEntity login(@RequestBody LoginInfo loginInfo, HttpServletResponse httpServletResponse){
         log.info("로그인 요청이 들어왔습니다");
         return authService.login(loginInfo,httpServletResponse);
 
@@ -55,7 +55,7 @@ public class AuthController {
 
     @Operation(summary = "로그아웃",description = "로그아웃하면 회원에게 발급했던 토큰을 무효화한다")
     @PostMapping("/logout")
-    public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response){
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication!=null){
             new SecurityContextLogoutHandler().logout(request,response,authentication);
@@ -67,7 +67,7 @@ public class AuthController {
 
     @Operation(summary = "ACCESS토큰 재발급",description = "access토큰을 재발급한다")
     @PostMapping("/refresh")
-    public ResponseEntity refreshtoken(@CookieValue("refresh_token") String token){
+    public ResponseEntity<String> refreshtoken(@CookieValue("refresh_token") String token){
         return authService.refresh(token);
     }
 

@@ -2,9 +2,9 @@ package org.book.commerce.userservice.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.book.commerce.common.security.Users;
-import org.book.commerce.common.security.UsersRepository;
 import org.book.commerce.common.util.AESUtil;
+import org.book.commerce.userservice.domain.Users;
+import org.book.commerce.userservice.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
