@@ -1,5 +1,6 @@
 package org.book.commerce.orderservice.service;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.book.commerce.orderservice.dto.ReqBuyProduct;
@@ -8,7 +9,6 @@ import org.book.commerce.common.exception.CommonException;
 import org.book.commerce.common.exception.ConflictException;
 import org.book.commerce.common.exception.NotAcceptException;
 import org.book.commerce.common.exception.NotFoundException;
-import org.book.commerce.common.security.CustomUserDetails;
 import org.book.commerce.orderservice.domain.*;
 import org.book.commerce.orderservice.dto.*;
 import org.book.commerce.orderservice.repository.OrderRepository;
@@ -28,10 +28,9 @@ public class OrderService {
     private final CartOrderFeignClient cartOrderFeignClient;
     private final OrderProductFeignClient orderProductFeignClient;
 
-    public List<OrderlistDto> getOrderList(CustomUserDetails customUserDetails) {
+    public List<OrderlistDto> getOrderList(String userEmail) {
         // todo "결제대기"중인 주문건은 주문내역에 잡히지 말아야함
-        String userId = customUserDetails.getUsername();
-        List<Order> orderList = orderRepository.findAllByUserEmail(userId);
+        List<Order> orderList = orderRepository.findAllByUserEmail(userEmail);
         ArrayList<OrderlistDto> orderlistDtos = new ArrayList<>();
         for (Order order : orderList) { // 사용자의 여태까지의 모든 주문내역을 조회하고 그 주문내역하나당 물품을 다 보여줘야함
             List<ProductOrder> productOrderList = productOrderRepository.findAllByOrderId(order.getOrderId());
@@ -95,8 +94,7 @@ public class OrderService {
         }
     }
 
-    public OrderResultDto orderCartList(CustomUserDetails customUserDetails) {
-        String userEmail = customUserDetails.getUsername();
+    public OrderResultDto orderCartList(String userEmail) {
         Order order = Order.builder().userEmail(userEmail)
                 .status(OrderStatus.WAITING_PAYING)
                 .build();
@@ -122,11 +120,13 @@ public class OrderService {
         return new OrderResultDto(orderId);
     }
 
+    //todo 서킷브레이커 : 유저 정보를 가져오지 못할때, 즉 customUserDetail 에서 에러가 발생했을때  "비회원으로 주문하기"메서드가 실행되도록
     @Transactional
-    public OrderResultDto orderProduct(CustomUserDetails customUserDetails, ReqBuyProduct reqBuyProduct) {
+    @CircuitBreaker(name="user-circuit-breaker", fallbackMethod = "fallbackOrderProduct")
+    public OrderResultDto orderProduct(String userEmail, ReqBuyProduct reqBuyProduct) {
         orderProductFeignClient.minusStock(reqBuyProduct.getProductId(),new OrderProductCountFeignRequest(reqBuyProduct.getProductId(), reqBuyProduct.getQuantity()));
         log.info("재고가 성공적으로 감소하였습니다.");
-        Order order = Order.builder().status(OrderStatus.WAITING_PAYING).userEmail(customUserDetails.getUsername()).build();
+        Order order = Order.builder().status(OrderStatus.WAITING_PAYING).userEmail(userEmail).build();
         Long orderId = orderRepository.save(order).getOrderId();
         ProductOrder productOrder = ProductOrder.builder().productId(reqBuyProduct.getProductId()).count(reqBuyProduct.getQuantity())
                 .orderId(orderId).build();
@@ -170,8 +170,6 @@ public class OrderService {
             for (ProductOrder productOrder : productOrderList) {
                 orderProductCountList.add(new OrderProductCountFeignRequest(productOrder.getProductId(), productOrder.getCount()));
             }
-            ;
-            // todo count를 넘겨주면 재고 증가시키도록 (plusStock) => 재고 증가시키고 물품 저장까지
             orderProductFeignClient.plusStockList(orderProductCountList);
         }
         log.info("재고가 성공적으로 변경되었습니다.");

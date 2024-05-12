@@ -8,10 +8,8 @@ import org.book.commerce.cartservice.dto.AddCartResult;
 import org.book.commerce.cartservice.dto.CartListDto;
 import org.book.commerce.cartservice.dto.CartOrderFeignResponse;
 import org.book.commerce.cartservice.service.CartService;
-import org.book.commerce.common.security.CustomUserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,9 +25,9 @@ public class CartController {
     private final CartService cartService;
     @Operation(summary = "장바구니 추가", description = "장바구니에 물품을 추가한다")
     @PostMapping("/add/{productId}")
-    public ResponseEntity addCart(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+    public ResponseEntity addCart(@RequestHeader("X-Authorization-Id") String userEmail,
                                                  @PathVariable Long productId, @RequestParam int count){
-        AddCartResult addCartResult = cartService.addCart(customUserDetails,productId,count);
+        AddCartResult addCartResult = cartService.addCart(userEmail,productId,count);
         return ResponseEntity.status(HttpStatus.OK).body(addCartResult);
     }
 
@@ -50,8 +48,8 @@ public class CartController {
 
     @Operation(summary = "장바구니 조회",description = "장바구니에 담긴 물품들을 조회한다")
     @GetMapping("/getCart")
-    public ResponseEntity<List<CartListDto>> getCartlist(@AuthenticationPrincipal CustomUserDetails customUserDetails){
-        List<CartListDto> cartListDto = cartService.getCartList(customUserDetails);
+    public ResponseEntity<List<CartListDto>> getCartlist(@RequestHeader("X-Authorization-Id") String userEmail){
+        List<CartListDto> cartListDto = cartService.getCartList(userEmail);
         return ResponseEntity.status(HttpStatus.OK).body(cartListDto);
     }
 

@@ -5,14 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.book.commerce.orderservice.dto.ReqBuyProduct;
-import org.book.commerce.common.security.CustomUserDetails;
 import org.book.commerce.orderservice.dto.OrderResultDto;
 import org.book.commerce.orderservice.dto.OrderlistDto;
 import org.book.commerce.orderservice.dto.PayInfo;
 import org.book.commerce.orderservice.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,22 +25,22 @@ public class OrderController {
     //todo 1.상품 주문하기 => 장바구니에 있는 상품 주문, 장바구니에 있는 상품 삭제
     @Operation(summary = "장바구니 물품 주문", description = "장바구니에서 바로 주문을 한다")
     @PostMapping("/orderCartList")
-    public ResponseEntity<OrderResultDto> orderCartList(@AuthenticationPrincipal CustomUserDetails customUserDetails){
-        OrderResultDto orderResultDto = orderService.orderCartList(customUserDetails);
+    public ResponseEntity<OrderResultDto> orderCartList(@RequestHeader("X-Authorization-Id") String userEmail){
+        OrderResultDto orderResultDto = orderService.orderCartList(userEmail);
         return ResponseEntity.status(HttpStatus.OK).body(orderResultDto);
     }
 
     @Operation(summary = "상세페이지 물품 주문", description = "상세페이지에서 바로 주문을 한다")
     @PostMapping("/orderProduct")
-    public ResponseEntity<OrderResultDto> orderProduct(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+    public ResponseEntity<OrderResultDto> orderProduct(@RequestHeader("X-Authorization-Id") String userEmail,
                                           @RequestBody ReqBuyProduct reqBuyProduct){
-            OrderResultDto orderResultDto = orderService.orderProduct(customUserDetails,reqBuyProduct);
+            OrderResultDto orderResultDto = orderService.orderProduct(userEmail,reqBuyProduct);
             return ResponseEntity.status(HttpStatus.OK).body(orderResultDto);
     }
 
     @Operation(summary = "주문 건 결제 요청", description = "주문한 제품을 결제한다")
     @PutMapping("/payOrder/{orderId}")
-    public ResponseEntity payOrder(@PathVariable Long orderId,
+    public ResponseEntity<String> payOrder(@PathVariable Long orderId,
                                    @RequestBody PayInfo payInfo){
             log.info("[OrderService] 주문 결제 요청이 들어왔습니다. 주문번호 = "+orderId);
             orderService.payOrder(orderId,payInfo);
@@ -52,15 +50,15 @@ public class OrderController {
 
     @Operation(summary = "나의 주문이력 조회",description = "나의 주문이력을 조회한다(주문번호,주문일자,주문상태 조회 가능")
     @GetMapping("/orderlist")
-    public ResponseEntity<List<OrderlistDto>> orderList(@AuthenticationPrincipal CustomUserDetails customUserDetails){
+    public ResponseEntity<List<OrderlistDto>> orderList(@RequestHeader("X-Authorization-Id") String userEmail){
         //todo 주문번호, 주문일자와 주문상태가 나타날건데,,,,, 여태 주문했던 내역을 모두 보여준다. 즉, 배송완료된 상품들까지,
         // todo 최신순으로 보여주기!
-        List<OrderlistDto> orderLists = orderService.getOrderList(customUserDetails);
+        List<OrderlistDto> orderLists = orderService.getOrderList(userEmail);
         return ResponseEntity.status(HttpStatus.OK).body(orderLists);
     }
     @Operation(summary = "주문 취소",description = "주문한 물품을 주문 취소한다")
     @PutMapping("/cancel/{orderId}")
-    public ResponseEntity cancelOrder(@PathVariable Long orderId){
+    public ResponseEntity<String> cancelOrder(@PathVariable Long orderId){
         orderService.cancelOrder(orderId);
         return ResponseEntity.status(HttpStatus.OK).body("주문 취소가 완료되었습니다!");
     }

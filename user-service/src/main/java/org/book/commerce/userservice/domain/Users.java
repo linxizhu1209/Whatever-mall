@@ -1,4 +1,4 @@
-package org.book.commerce.common.security;
+package org.book.commerce.userservice.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
