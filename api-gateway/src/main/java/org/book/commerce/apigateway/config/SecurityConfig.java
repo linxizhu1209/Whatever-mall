@@ -19,18 +19,6 @@ import reactor.core.publisher.Mono;
 @EnableReactiveMethodSecurity
 @Configuration
 public class SecurityConfig {
-//    private final String[] PERMIT_URL = {
-//            "/", "/**", "/auth/**", "/css/**", "/images/**", "/js/**", "/favicon.ico", "/h2-console/**"
-//            , "/swagger-ui.html", "/swagger-ui/**", "/api-docs/**", "/v3/**", "/auth/login/**", "/product/**"
-//            , "/eureka"
-//    };
-//    private final String[] USER_URL = {
-//            "/user/**", "auth/logout", "/cart/**", "/order/**"
-//    };
-//    private final String[] ADMIN_URL = {
-//            "/admin/**", "/product/admin/**"
-//    };
-
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http.csrf(ServerHttpSecurity.CsrfSpec::disable)

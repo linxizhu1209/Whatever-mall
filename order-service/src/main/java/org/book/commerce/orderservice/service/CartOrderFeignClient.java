@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //@CircuitBreaker(name="circuit")
@@ -15,7 +16,7 @@ import java.util.List;
 public interface CartOrderFeignClient {
 
     @GetMapping("/findCart")
-    List<CartOrderFeignResponse> findCartListByUserEmail(@RequestParam("userEmail") String userEmail);
+    ArrayList<CartOrderFeignResponse> findCartListByUserEmail(@RequestParam("userEmail") String userEmail);
 
     @DeleteMapping("/deleteAll")
     ResponseEntity deleteAllCart(@RequestParam("userEmail") String userEmail);

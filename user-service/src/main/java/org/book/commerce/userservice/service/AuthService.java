@@ -53,7 +53,7 @@ public class AuthService {
         // 이름, 전화번호, 주소, 이메일 암호화
         String encryptRegistNum = aesUtil.encrypt(signupInfo.getRegistration());
         String encryptName = aesUtil.encrypt(signupInfo.getName());
-        String encryptPhoneNum = aesUtil.encrypt(signupInfo.getPhonenum());
+        String encryptPhoneNum = aesUtil.encrypt(signupInfo.getPhoneNum());
         String encryptEmail = aesUtil.encrypt(signupInfo.getEmail());
         String encryptAddress = aesUtil.encrypt(signupInfo.getAddress());
         Users user = Users.builder().email(encryptEmail).password(encodePwd)

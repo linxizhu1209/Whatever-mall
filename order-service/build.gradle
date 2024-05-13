@@ -16,7 +16,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.cloud:spring-cloud-config-client'
 
-	implementation 'org.springframework.boot:spring-boot-starter-security'
+//	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	// mysql 의존성
@@ -24,7 +24,7 @@ dependencies {
 	// redis 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-//	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
 
 
 }

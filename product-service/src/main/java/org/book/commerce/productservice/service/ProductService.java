@@ -35,15 +35,17 @@ public class ProductService {
     private final RedisTemplate<String,Object> redisTemplate;
     private final ImageUploadService imageUploadService;
 
+    @Transactional
     public void addProduct(AddProductDto addProductDto) {
         Product product = Product.builder().stock(addProductDto.getStock()).name(addProductDto.getName()).price(addProductDto.getPrice())
                 .description(addProductDto.getDescription())
                 .thumbnailName(addProductDto.getImageName()).thumbnailUrl(addProductDto.getImageUrl()).isLimitedEdition(addProductDto.getIsLimitedEdition())
-                .openDateTime(addProductDto.getOpenDateTime()).build(); // 이후 어떤 관리자가 올렸는지 관리자 id도 저장할 예정
+                .openDateTime(addProductDto.getOpenDateTime()).build();
         Long productId = productRepository.save(product).getProductId();
         imageUploadService.upload(productId, addProductDto.getImageName(), addProductDto.getImageUrl());
         }
 
+    @Transactional
     public ResponseEntity<List<AllProductList>> getProducts() {
         List<Product> productlist = productRepository.findAll();
         List<AllProductList> productDtoList = productlist.stream().map(ProductMapper.INSTANCE::ProductEntityToDto).toList();
@@ -55,6 +57,7 @@ public class ProductService {
      *  1. 만약 한정판 제품이라면(isLimitedEdition==true), isOpen을 false로 반환(오픈시간이 되지 않았을 경우), 오픈시간도 제공
      *  2. 한정판 제품이 아니라면, 기본적으로 isOpen는 true로 설정
      */
+    @Transactional
     public ResponseEntity<ProductDetail> getProductDetail(Long productId) {
         Product product = findProductById(productId);
         List<Image> imageList = imageRepository.findAllByProductId(productId);
@@ -80,6 +83,7 @@ public class ProductService {
     }
 
 
+    @Transactional
     public void editProduct(Long productId, EditProduct editProduct) {
         Product product = findProductById(productId);
         if (editProduct.getDescription() != null) {
@@ -104,6 +108,7 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    @Transactional
     public List<ProductFeignResponse> findProduct(long[] productIdList) {
         ArrayList<ProductFeignResponse> productList = new ArrayList<>();
         for (Long productId : productIdList) {
@@ -113,6 +118,7 @@ public class ProductService {
         return productList;
     }
 
+    @Transactional
     public List<CartProductFeignResponse> findCartProduct(long[] productIdList) {
         ArrayList<CartProductFeignResponse> productList = new ArrayList<>();
         for (Long productId : productIdList) {
@@ -185,7 +191,7 @@ public class ProductService {
     @Transactional
     public void minusStockList(ArrayList<OrderProductCountFeignRequest> orderProductCount) { // 장바구니에서 한꺼번에 시키는 경우 재고 감소(장바구니 로직)
         for (OrderProductCountFeignRequest orderProduct : orderProductCount) {
-            ProductStockDetail stockDetail = (ProductStockDetail) redisTemplate.opsForValue().get(orderProduct.productId());
+            ProductStockDetail stockDetail = (ProductStockDetail) redisTemplate.opsForValue().get("productStockCache::"+orderProduct.productId());
             if(stockDetail!=null) { // 캐시된 재고가 있는 경우 db와 캐시된 데이터는 같지않을 수 있으므로, 캐시 데이터에서 변동시켜준 값을 넣어줘야함
                 int changeStock = stockDetail.getStock()-orderProduct.count();
                 if (changeStock < 0) throw new ConflictException("주문하신 상품의 재고가 부족하여 구매를 할 수 없습니다. 확인해주세요. 상품 번호: " + orderProduct.productId());
@@ -200,7 +206,7 @@ public class ProductService {
                 if (changeStock < 0) throw new ConflictException("주문하신 상품의 재고가 부족하여 구매를 할 수 없습니다. 확인해주세요. 상품 번호: " + orderProduct.productId());
                 ProductStockDetail productDetail = ProductStockDetail.builder().stock(changeStock)
                         .productId(orderProduct.productId()).modified(true).build();
-                redisTemplate.opsForValue().set(String.valueOf(product.getProductId()),productDetail);
+                redisTemplate.opsForValue().set("productStockCache::"+String.valueOf(product.getProductId()),productDetail);
             }
         }
     }

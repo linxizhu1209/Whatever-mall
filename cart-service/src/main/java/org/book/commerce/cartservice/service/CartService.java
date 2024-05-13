@@ -23,6 +23,7 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CartProductFeignClient cartProductFeignClient;
 
+    @Transactional
     public AddCartResult addCart(String userEmail, Long productId, int count) {
         if(cartRepository.existsByUserEmailAndProductId(userEmail,productId)){
             throw new ConflictException("이미 장바구니에 있는 제품입니다.");
@@ -33,18 +34,18 @@ public class CartService {
         Long cartId = cartRepository.save(cart).getCartId();
         return new AddCartResult(cartId);
     }
-    
+    @Transactional
     public void deleteCart(Long cartId){
         Cart cart = cartRepository.findById(cartId).orElseThrow(()->new NotFoundException("요청한 장바구니를 찾을 수 없습니다"));
         cartRepository.delete(cart);
     }
-
+    @Transactional
     public void updateCart(Long cartId, int count) {
         Cart cart = cartRepository.findById(cartId).orElseThrow(()->new NotFoundException("요청한 장바구니를 찾을 수 없습니다"));
         cart.setCount(count);
         cartRepository.save(cart);
     }
-
+    @Transactional
     public List<CartListDto> getCartList(String userEmail) {
         List<Cart> cartList = cartRepository.findAllByUserEmail(userEmail);
         long[] productIdList = cartList.stream().map(Cart::getProductId).mapToLong(i->i).toArray();
@@ -59,7 +60,7 @@ public class CartService {
         return cartListDtos;
     }
 
-    public List<CartOrderFeignResponse> findCartList(String userId) {
+    public ArrayList<CartOrderFeignResponse> findCartList(String userId) {
         List<Cart> cartList = cartRepository.findAllByUserEmail(userId);
         ArrayList<CartOrderFeignResponse> cartOrderlist = new ArrayList<>();
         for(Cart cart:cartList){

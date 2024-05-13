@@ -1,6 +1,7 @@
 package org.book.commerce.userservice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -55,14 +56,14 @@ public class AuthController {
 
     @Operation(summary = "로그아웃",description = "로그아웃하면 회원에게 발급했던 토큰을 무효화한다")
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication!=null){
-            new SecurityContextLogoutHandler().logout(request,response,authentication);
-            String token = authentication.getCredentials().toString();
+    public ResponseEntity<String> logout(@Parameter(hidden = true) @RequestHeader("X-TOKEN") String token, HttpServletRequest request, HttpServletResponse response){
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if(authentication!=null){
+//            new SecurityContextLogoutHandler().logout(request,response,authentication);
+//            String token = authentication.getCredentials().toString();
             return authService.logout(token);
-        }
-       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("로그아웃에 실패했습니다!");
+//        }
+//       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("로그아웃에 실패했습니다!");
     }
 
     @Operation(summary = "ACCESS토큰 재발급",description = "access토큰을 재발급한다")
