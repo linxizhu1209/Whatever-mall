@@ -76,13 +76,14 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             else {
                 if(!userRole.equalsIgnoreCase("USER")) return onError(exchange, "do not have permission", HttpStatus.FORBIDDEN);
             }
-            addAuthorizationHeaders(exchange.getRequest(),getEmailByToken(jwt));
+            addAuthorizationHeaders(exchange.getRequest(),getEmailByToken(jwt),jwt);
             return chain.filter(exchange);
         };
     }
 
-    private void addAuthorizationHeaders(ServerHttpRequest request, String emailByToken) {
+    private void addAuthorizationHeaders(ServerHttpRequest request, String emailByToken,String token) {
         request.mutate().header("X-Authorization-Id",emailByToken);
+        request.mutate().header("X-TOKEN",token);
     }
 
 
@@ -138,7 +139,7 @@ private String resolveTokenRole(String token) {
                 ,"/eureka"
         };
         public static final String[] USER_URL = {
-                 "auth/logout","/cart/**","/order/**"
+                 "/auth/logout","/cart/**","/order/**","/wish/**","/user/**"
         };
         public static final String[] ADMIN_URL = {
                 "/admin/**", "/product/admin/**"

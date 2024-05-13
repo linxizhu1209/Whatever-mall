@@ -1,19 +1,25 @@
-package org.book.commerce.common.config;
+package org.book.commerce.userservice.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
+@OpenAPIDefinition
 @Configuration
 public class SwaggerConfig {
 
     @Bean
-    public OpenAPI openAPI(){
+    public OpenAPI openAPI(@Value("${openapi.service.url}") String url){
         Info info = new Info().title("Ecommerce 서비스 API 명세")
                 .description("Ecommerce 서비스 이용 명세서입니다")
                 .contact(new Contact().email("dlahj1209@naver.com").name("LIMHEEJU")
@@ -34,7 +40,7 @@ public class SwaggerConfig {
         SecurityRequirement addSecurityItem = new SecurityRequirement();
         addSecurityItem.addList("Authorization"); // Authorization 헤더에 보안 스키마 추가
 
-        return new OpenAPI().components(new Components().addSecuritySchemes("Authorization",bearerAuth))
+        return new OpenAPI().servers(List.of(new Server().url(url))).components(new Components().addSecuritySchemes("Authorization",bearerAuth))
                 .addSecurityItem(addSecurityItem).info(info);
     }
 }

@@ -40,6 +40,7 @@ services:
       SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/linxizhu1209/config-repo
       SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT-LABEL: master
       SPRING_CLOUD_CONFIG_SERVER_GIT_BOOTSTRAP: true
+      ENCRYPT_KEY: "djklsafwakkldsf2152saf"
 #    volumes:
 #      - /config-server/src/main/resources/:/app/
   discovery-server:
@@ -51,13 +52,29 @@ services:
     environment:
       SPRING_APPLICATION_NAME: discovery-server
       SPRING_CONFIG_LOCATION: /application.yml
-      SPRING_CONFIG_IMPORT: "optional:configserver:http://config-server:8081/"
-      spring.config.import: "optional:configserver:http://config-server:8081/"
       CONFIG_SERVER_URI: "http://config-server:8081"
     networks:
       - commerce-network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://discovery-server:8761/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+  api-gateway:
+    image: api-gateway:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - config-server
+    environment:
+      SPRING_APPLICATION_NAME: api-gateway
+      SPRING_CONFIG_LOCATION: /application.yml
+      CONFIG_SERVER_URI: "http://config-server:8081"
+    networks:
+      - commerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://api-gateway:8761/actuator/health || exit 1"]
       interval: 10s
       timeout: 3s
       retries: 3

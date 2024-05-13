@@ -93,13 +93,13 @@ public class OrderService {
             orderRepository.save(order);
         }
     }
-
+    @Transactional
     public OrderResultDto orderCartList(String userEmail) {
         Order order = Order.builder().userEmail(userEmail)
                 .status(OrderStatus.WAITING_PAYING)
                 .build();
         Long orderId = orderRepository.save(order).getOrderId();
-        List<CartOrderFeignResponse> cartList = cartOrderFeignClient.findCartListByUserEmail(userEmail);
+        ArrayList<CartOrderFeignResponse> cartList = cartOrderFeignClient.findCartListByUserEmail(userEmail);
         ArrayList<OrderProductCountFeignRequest> orderProductCountList = new ArrayList<>();
         for (CartOrderFeignResponse cart : cartList) {
             orderProductCountList.add(new OrderProductCountFeignRequest(cart.productId(), cart.count()));
@@ -140,6 +140,7 @@ public class OrderService {
             Order order = findOrderById(orderId);
             order.setStatus(OrderStatus.ORDER_CANCEL);
             returnStock(order);
+            //todo "결제가 취소되었습니다!"
         } else { // 결제 진행
             if (payInfo.getIsLimitExcess()) { //한도 초과인 경우(고객 귀책)
                 Order order = findOrderById(orderId);

@@ -14,13 +14,11 @@ public class JacksonConfig {
         public ObjectMapper objectMapper() {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
-//            objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
-            objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
             return objectMapper;
         }
 
-        @Bean
-        public RedisSerializer<Object> redisSerializer(ObjectMapper objectMapper) {
-        return new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
-        }
+//        @Bean
+//        public RedisSerializer<Object> redisSerializer(ObjectMapper objectMapper) {
+//        return new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
+//        }
 }

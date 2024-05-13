@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -54,7 +55,7 @@ public class CartController {
     }
 
     @GetMapping("/findCart")
-    public List<CartOrderFeignResponse> findCartListByUserEmail(@RequestParam("userEmail") String userEmail){
+    public ArrayList<CartOrderFeignResponse> findCartListByUserEmail(@RequestParam("userEmail") String userEmail){
         log.info("[OrderService-CartService] open feign 통신이 성공하였습니다");
         return cartService.findCartList(userEmail);
     }
