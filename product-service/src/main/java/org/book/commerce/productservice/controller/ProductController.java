@@ -24,9 +24,9 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
-    @PostMapping("/admin/add")//,consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("/admin/add")
     @Operation(summary = "관리자의 물품 등록",description = "관리자가 묾품을 등록한다")
-    public ResponseEntity<String> addProduct(@Valid @RequestBody AddProductDto addProductDto){ //@RequestPart(name="productImage", required = false) MultipartFile productImages)     {
+    public ResponseEntity<String> addProduct(@Valid @RequestBody AddProductDto addProductDto){
         productService.addProduct(addProductDto);
         return ResponseEntity.status(HttpStatus.OK).body("상품 추가가 완료되었습니다!");
     }
@@ -97,5 +97,10 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body("재고가 성공적으로 변경되었습니다.");
     }
 
-
+    @GetMapping("/isExistProduct/{productId}")
+    public ResponseEntity<String> isExistProduct(@PathVariable Long productId){
+        log.info("[User/Cart->Product] open feign 통신이 성공하였습니다");
+        productService.existProduct(productId);
+        return ResponseEntity.status(HttpStatus.OK).body("물품이 존재합니다.");
+    }
 }

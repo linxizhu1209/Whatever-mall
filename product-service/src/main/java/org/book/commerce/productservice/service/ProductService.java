@@ -75,11 +75,6 @@ public class ProductService {
                     .imglist(imgListsDto).build();
             return ResponseEntity.status(HttpStatus.OK).body(productDetail);
         }
-
-        // todo 만약 한정판 제품이라면, 오픈시간이 지나지 않았으면 주문하기 버튼이 활성화되지 않아야함
-        // todo 한정판 제품이면서 오픈시간이 지낫다면 isOpen을 true로, 오픈시간이 지나지않았다면 false로 반환
-        // 만약 한정판 제품이 아니라면, 항상 open이 되도록 즉, isOpen이 기본 true로 되도록 설정
-        // 만약 open이 false라면 오픈시간까지 적어서 return, 그게 아니라면 한정판 여부만 보내주기(기본은 false임)
     }
 
 
@@ -157,7 +152,7 @@ public class ProductService {
                 log.info("[재고 감소 로직 실행중] 현재 재고: {}",changedStock);
             }
             else{ // cache에 데이터가 없다는건 유효기간이 돼서 사라졌고, db는 업데이트 된 정보이므로 db에서 꺼내서 재고 적용
-                Product product = findProductById(orderProduct.productId()); // product을 일일이 찾아올 필요가 없음. 오히려 select문이 늘어남
+                Product product = findProductById(orderProduct.productId());
                 if(product.getStock()==0) throw new ConflictException("주문하신 상품의 재고가 부족하여 구매를 할 수 없습니다. 확인해주세요. 상품 번호: " + orderProduct.productId());
                 changedStock = product.getStock() - orderProduct.count();
             }
@@ -225,7 +220,6 @@ public class ProductService {
                 changedStock = product.getStock() + orderProduct.count();
             }
 
-            // todo 만약 write-back 전략이면 db와 캐시 정보가 다를수도 있으므로, 캐시가 있다면 캐시에서 재고를 변동시켜준 값을 저장해야하고, 캐시가 없으면 db에서 재고를 변동시켜준 값을 저장해야함
             // write-back 전략을 사용한다면 cache만 수정되었음을 표시하기 위해 modified필드 true
             ProductStockDetail productStockDetailAfter = ProductStockDetail.builder().stock(changedStock)
                     .productId(orderProduct.productId()).modified(true).build();
@@ -282,6 +276,10 @@ public class ProductService {
         productRepository.saveAll(productList);
     }
 
+    public void existProduct(Long productId) {
+        boolean isExistProduct = productRepository.existsById(productId);
+        if(!isExistProduct) throw new NotFoundException("존재하지 않는 물품입니다. 물품 번호(productId:"+productId+")");
+    }
 
 
     /**

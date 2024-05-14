@@ -14,7 +14,6 @@ import org.book.commerce.common.entity.BaseEntity;
 @Getter
 @Table(name="image")
 public class Image extends BaseEntity {
-    // todo 이후에 s3에 파일을 올려서 해당 파일을 보여줄 수 있도록 수정 예정
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

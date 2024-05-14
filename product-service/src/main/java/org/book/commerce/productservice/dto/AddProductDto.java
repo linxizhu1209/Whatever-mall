@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddProductDto {
-    // 유효성 추가
+
     @JsonProperty("name")
     @Schema(description = "물품이름",example = "장화신은고양이")
     private String name;

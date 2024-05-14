@@ -17,7 +17,7 @@ public class ProductDetail {
     @Schema(description = "상세설명",example = "sf과학소설이다")
     private String description;
     @Schema(description = "재고",example = "150")
-    private int stock; // 재고는 구매하기 전 조그만 팝업?창에서 보여주기
+    private int stock;
     @Schema(description = "가격",example = "20000")
     private long price;
 

@@ -17,9 +17,5 @@ public class ImageUploadService {
         Image image = Image.builder().imgUrl(imgUrl).productId(productId).name(imgName).build();
         imageRepository.save(image);
         log.info("이미지 저장 완료");
-//        String orginName = productImage.getOriginalFilename();
-//        String ext = orginName.substring(orginName.lastIndexOf("."));
-//        String uuid = UUID.randomUUID().toString()+ext;
-//        String imageUrl = orginName.
     }
 }

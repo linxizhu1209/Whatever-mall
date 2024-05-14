@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class StockScheduler {
     private final ProductService productService;
 
-    @Scheduled(cron = "0 */10 * * * *")
+    @Scheduled(cron = "0 */30 * * * *")
     public void synchronizeDB(){
         log.info("[Synchronize DB-Cache] 스케줄러 작동중: 현재시각 : "+ LocalDateTime.now());
         productService.synchronizeDB();
