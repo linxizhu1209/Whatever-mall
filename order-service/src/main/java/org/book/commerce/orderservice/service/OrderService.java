@@ -1,6 +1,5 @@
 package org.book.commerce.orderservice.service;
 
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.book.commerce.orderservice.dto.ReqBuyProduct;
@@ -29,13 +28,11 @@ public class OrderService {
     private final OrderProductFeignClient orderProductFeignClient;
 
     public List<OrderlistDto> getOrderList(String userEmail) {
-        // todo "결제대기"중인 주문건은 주문내역에 잡히지 말아야함
-        List<Order> orderList = orderRepository.findAllByUserEmail(userEmail);
+        List<Order> orderList = orderRepository.findAllByUserEmailAndStatusNot(userEmail,OrderStatus.WAITING_PAYING);
         ArrayList<OrderlistDto> orderlistDtos = new ArrayList<>();
-        for (Order order : orderList) { // 사용자의 여태까지의 모든 주문내역을 조회하고 그 주문내역하나당 물품을 다 보여줘야함
+        for (Order order : orderList) {
             List<ProductOrder> productOrderList = productOrderRepository.findAllByOrderId(order.getOrderId());
             long[] productIdArr = productOrderList.stream().map(ProductOrder::getProductId).mapToLong(i -> i).toArray();
-            // product,productprice,productId를 가져와야함
             List<ProductFeignResponse> productFeignlist = orderProductFeignClient.findProductByProductId(productIdArr);
             List<OrderProductListDto> orderProductListDtos = new ArrayList<>();
             for (ProductFeignResponse product : productFeignlist) {
@@ -47,8 +44,7 @@ public class OrderService {
                     .orderStatus(order.getStatus()).orderDate(order.getCreatedAt())
                     .orderProductList(orderProductListDtos).build());
         }
-        // 이중 for문을 없애는 방법과 호출 줄이는 방법 없을지 고민
-        // orderlist에는 간단하게 주문id와 주문날짜, 상태만 보여주고 상세로 들어가야지 주문 아이템 목록을 보여주는 것도 생각
+        orderlistDtos.sort(((o1, o2) -> o2.getOrderDate().compareTo(o1.getOrderDate())));
         return orderlistDtos;
     }
 
@@ -115,32 +111,29 @@ public class OrderService {
         ;
         productOrderRepository.saveAll(productOrders);
         cartOrderFeignClient.deleteAllCart(userEmail);
-        // 위에는 userEmail 넘기면 그 유저의 장바구니는 다 지워버리도록(장바구니에서 주문이 가능하고, 한번주문할때 장바구니에 들어있는 모든 물품을 주문하는것이므로)
 
         return new OrderResultDto(orderId);
     }
 
-    //todo 서킷브레이커 : 유저 정보를 가져오지 못할때, 즉 customUserDetail 에서 에러가 발생했을때  "비회원으로 주문하기"메서드가 실행되도록
     @Transactional
-    @CircuitBreaker(name="user-circuit-breaker", fallbackMethod = "fallbackOrderProduct")
     public OrderResultDto orderProduct(String userEmail, ReqBuyProduct reqBuyProduct) {
-        orderProductFeignClient.minusStock(reqBuyProduct.getProductId(),new OrderProductCountFeignRequest(reqBuyProduct.getProductId(), reqBuyProduct.getQuantity()));
-        log.info("재고가 성공적으로 감소하였습니다.");
-        Order order = Order.builder().status(OrderStatus.WAITING_PAYING).userEmail(userEmail).build();
-        Long orderId = orderRepository.save(order).getOrderId();
-        ProductOrder productOrder = ProductOrder.builder().productId(reqBuyProduct.getProductId()).count(reqBuyProduct.getQuantity())
-                .orderId(orderId).build();
-        productOrderRepository.save(productOrder);
-        return new OrderResultDto(orderId);
+            orderProductFeignClient.minusStock(reqBuyProduct.getProductId(), new OrderProductCountFeignRequest(reqBuyProduct.getProductId(), reqBuyProduct.getQuantity()));
+            log.info("재고가 성공적으로 감소하였습니다.");
+            Order order = Order.builder().status(OrderStatus.WAITING_PAYING).userEmail(userEmail).build();
+            Long orderId = orderRepository.save(order).getOrderId();
+            ProductOrder productOrder = ProductOrder.builder().productId(reqBuyProduct.getProductId()).count(reqBuyProduct.getQuantity())
+                    .orderId(orderId).build();
+            productOrderRepository.save(productOrder);
+            return new OrderResultDto(orderId);
     }
 
     @Transactional
-    public void payOrder(Long orderId, PayInfo payInfo) {
+    public boolean payOrder(Long orderId, PayInfo payInfo) {
         if (payInfo.getIsCanceled()) {
             Order order = findOrderById(orderId);
             order.setStatus(OrderStatus.ORDER_CANCEL);
             returnStock(order);
-            //todo "결제가 취소되었습니다!"
+            return false;
         } else { // 결제 진행
             if (payInfo.getIsLimitExcess()) { //한도 초과인 경우(고객 귀책)
                 Order order = findOrderById(orderId);
@@ -151,6 +144,7 @@ public class OrderService {
             } else { //한도초과도 아니고 정상적으로 결제된 경우
                 Order order = findOrderById(orderId);
                 order.setStatus(OrderStatus.ORDER_COMPLETE);
+                return true;
             }
         }
     }
@@ -182,7 +176,6 @@ public class OrderService {
         for (Order order : orderList) {
             order.setStatus(OrderStatus.ORDER_CANCEL);
             returnStock(order);
-            // todo 한꺼번에 상태를 바꾸고, 한꺼번에 넘겨서 재고 변동하도록 로직 바꿔보기
         }
     }
 

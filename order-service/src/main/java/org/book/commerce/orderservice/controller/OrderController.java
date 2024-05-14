@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping("/order")
 public class OrderController {
     private final OrderService orderService;
-    //todo 1.상품 주문하기 => 장바구니에 있는 상품 주문, 장바구니에 있는 상품 삭제
+
     @Operation(summary = "장바구니 물품 주문", description = "장바구니에서 바로 주문을 한다")
     @PostMapping("/orderCartList")
     public ResponseEntity<OrderResultDto> orderCartList(@RequestHeader("X-Authorization-Id") String userEmail){
@@ -43,30 +43,28 @@ public class OrderController {
     public ResponseEntity<String> payOrder(@PathVariable Long orderId,
                                    @RequestBody PayInfo payInfo){
             log.info("[OrderService] 주문 결제 요청이 들어왔습니다. 주문번호 = "+orderId);
-            orderService.payOrder(orderId,payInfo);
-            return ResponseEntity.status(HttpStatus.OK).body("주문한 건에 대해 결제가 완료되었습니다!");
+            boolean isPaid = orderService.payOrder(orderId,payInfo);
+            if(isPaid) return ResponseEntity.status(HttpStatus.OK).body("주문한 건에 대해 결제가 완료되었습니다!");
+            else return ResponseEntity.status(HttpStatus.OK).body("주문한 건에 대하여 정상적으로 결제 취소되었습니다.");
     }
 
 
     @Operation(summary = "나의 주문이력 조회",description = "나의 주문이력을 조회한다(주문번호,주문일자,주문상태 조회 가능")
     @GetMapping("/orderlist")
     public ResponseEntity<List<OrderlistDto>> orderList(@RequestHeader("X-Authorization-Id") String userEmail){
-        //todo 주문번호, 주문일자와 주문상태가 나타날건데,,,,, 여태 주문했던 내역을 모두 보여준다. 즉, 배송완료된 상품들까지,
-        // todo 최신순으로 보여주기!
         List<OrderlistDto> orderLists = orderService.getOrderList(userEmail);
         return ResponseEntity.status(HttpStatus.OK).body(orderLists);
     }
-    @Operation(summary = "주문 취소",description = "주문한 물품을 주문 취소한다")
+    @Operation(summary = "주문 취소",description = "주문한 물품을 주문 취소한다(배송 상태가 \"주문완료\"인 경우에만 가능")
     @PutMapping("/cancel/{orderId}")
     public ResponseEntity<String> cancelOrder(@PathVariable Long orderId){
         orderService.cancelOrder(orderId);
         return ResponseEntity.status(HttpStatus.OK).body("주문 취소가 완료되었습니다!");
     }
-    // todo 4. 반품하기 => 현재 배송상태가 배송완료인지 확인, => 반품 신청상태로 바꾸고, 업데이트 된 날짜로부터 +1일 후에 재고에 반영 및 반품완료로 변경
 
     @Operation(summary = "물품 반품",description = "배송완료된 물품을 반품한다")
     @PutMapping("/refund/{orderId}")
-    public ResponseEntity refundOrder(@PathVariable Long orderId){
+    public ResponseEntity<String> refundOrder(@PathVariable Long orderId){
         orderService.refundOrder(orderId);
         return ResponseEntity.status(HttpStatus.OK).body("반품 신청이 완료되었습니다!");
     }

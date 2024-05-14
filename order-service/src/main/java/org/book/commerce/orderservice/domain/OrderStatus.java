@@ -10,20 +10,10 @@ public enum OrderStatus {
     FINISH_REFUND("반품완료"),
     WAITING_PAYING("결제대기");
 
-
-
     private final String status;
 
     OrderStatus(String status) {
         this.status = status;
     }
 
-    public static OrderStatus valueOfTerm(String statusName) throws Exception {
-        for(OrderStatus status:values()){
-            if(statusName.equals(status.status)){
-                return status;
-            }
-        }
-        throw new Exception("존재하지 않는 상태입니다.");
-    }
 }
