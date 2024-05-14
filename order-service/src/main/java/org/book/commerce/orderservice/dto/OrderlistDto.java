@@ -9,7 +9,6 @@ import org.book.commerce.orderservice.domain.OrderStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// 나의 주문내역을 보여준다
 @Builder
 @Getter
 @Setter

@@ -47,7 +47,6 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     @Override
     public GatewayFilter apply(AuthorizationHeaderFilter.Config config) {
         return (exchange, chain) -> {
-//            String requiredRole = config.getRequiredRole();
             ServerHttpRequest request = exchange.getRequest();
             String requestUri = request.getURI().getPath();
             log.info("요청한 uri : "+request.getURI());
@@ -91,7 +90,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     return response.setComplete();
 }
 
-private String resolveTokenRole(String token) {
+    private String resolveTokenRole(String token) {
     try {
         String subject = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
                 .getBody().get("roles").toString();

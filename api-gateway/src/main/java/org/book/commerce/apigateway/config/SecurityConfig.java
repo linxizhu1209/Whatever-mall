@@ -1,17 +1,14 @@
 package org.book.commerce.apigateway.config;
 
-import org.book.commerce.apigateway.filter.AuthorizationHeaderFilter;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
-import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 

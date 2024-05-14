@@ -19,14 +19,13 @@ public class UserService {
     private final UsersRepository usersRepository;
     private final AESUtil aesUtil;
     private final PasswordEncoder passwordEncoder;
-    public ResponseEntity<MyPageDto> getMypage(String email) {
+    public MyPageDto getMypage(String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(()->new NotFoundException("회원을 찾을 수 없습니다"));
-        MyPageDto mypage = MyPageDto.builder().email(aesUtil.decrypt(user.getEmail())).address(aesUtil.decrypt(user.getAddress()))
+        return MyPageDto.builder().email(aesUtil.decrypt(user.getEmail())).address(aesUtil.decrypt(user.getAddress()))
                 .phonenum(aesUtil.decrypt(user.getPhoneNum())).build();
-        return ResponseEntity.status(HttpStatus.OK).body(mypage);
     }
 
-    public ResponseEntity updateMyPage(String email, UpdateInfo updateInfo) {
+    public void updateMyPage(String email, UpdateInfo updateInfo) {
         Users user = usersRepository.findByEmail(email).orElseThrow(()->new NotFoundException("회원을 찾을 수 없습니다."));
         String address = updateInfo.getAddress();
         String password = updateInfo.getPassword();
@@ -41,6 +40,5 @@ public class UserService {
             user.setPhoneNum(aesUtil.encrypt(phoneNum));
         }
         usersRepository.save(user);
-        return ResponseEntity.status(HttpStatus.OK).body("회원정보 수정이 완료되었습니다");
     }
 }

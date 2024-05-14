@@ -1,8 +1,6 @@
 package org.book.commerce.common.config;
 
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -55,17 +53,18 @@ public class RedisConfig {
     }
 
     /**
-     * write-back 전략을 사용하는 경우, db에 업데이트한 후에 캐시가 삭제되어야하므로, 스케줄러로 삭제하되, 오류날경우를 대비해 업데이트 시간보다 긴 시간으로 유효시간 잡기
+     * write-back 전략을 사용하는 경우, db에 업데이트한 후에 캐시가 삭제되어야하므로, 스케줄러로 삭제하되,
+     * 스케줄러 오류날경우를 대비해 업데이트 시간보다 긴 시간으로 유효시간 잡기
      */
     @Bean
     public RedisCacheManager redisCacheManager(){
         RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer())) // 키는 보통 문자열로 지정하니까 StringRedisSerializer 사용
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer())) // 값의 경우 dto 객체를 저장할 수도 있으므로 JSON문자열로 직렬화하고 역직렬화할 수 있는 Serializer사용
-                .entryTtl(Duration.ofMinutes(30L)); // 캐시의 유효시간을 30분으로 설정
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
+                .entryTtl(Duration.ofMinutes(30L));
 
         HashMap<String, RedisCacheConfiguration> configMap = new HashMap<>();
-        configMap.put("productStockCache",RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(30L)));
+        configMap.put("productStockCache",RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofHours(3L)));
 
         return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(redisConnectionFactory())
                 .cacheDefaults(redisCacheConfiguration).build();

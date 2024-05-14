@@ -26,8 +26,4 @@ public class Scheduler {
         log.info("[Confirm PaymentDeadline] 스케쥴러 작동중: 현재시각 : "+ LocalDateTime.now());
         orderService.overPaymentDeadLine();
     }
-
-
-    // 비동기 처리 방식으로 해도됨.
-    // 상태별로 가져오는 방식으로 해보자. 날짜도 같이 비교해서 가져오는 방법?
 }

@@ -27,8 +27,5 @@ public class RedisUtil {
         return redisTemplate.delete(key);
     }
 
-    public boolean hashKey(String key){
-        return redisTemplate.hasKey(key);
-    }
 
 }

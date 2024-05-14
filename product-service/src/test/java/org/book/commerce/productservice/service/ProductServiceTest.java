@@ -42,7 +42,7 @@ class ProductServiceTest {
         for(int i=0;i<numThreads;i++){
             executorService.submit(()->{
                 try{
-                    productService.minusStock(orderProduct);
+                    productService.minusStock(String.valueOf(2L),orderProduct);
                     successCount.incrementAndGet();
                 } catch (Exception e){
                     System.out.println(e.getMessage());
