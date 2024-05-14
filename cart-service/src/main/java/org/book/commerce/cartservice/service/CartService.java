@@ -28,6 +28,7 @@ public class CartService {
         if(cartRepository.existsByUserEmailAndProductId(userEmail,productId)){
             throw new ConflictException("이미 장바구니에 있는 제품입니다.");
         }
+        cartProductFeignClient.isExistProduct(productId);
         Cart cart = Cart.builder().productId(productId)
                 .userEmail(userEmail)
                 .count(count).build();

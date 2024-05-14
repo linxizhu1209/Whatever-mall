@@ -26,7 +26,7 @@ public class CartController {
     private final CartService cartService;
     @Operation(summary = "장바구니 추가", description = "장바구니에 물품을 추가한다")
     @PostMapping("/add/{productId}")
-    public ResponseEntity addCart(@RequestHeader("X-Authorization-Id") String userEmail,
+    public ResponseEntity<AddCartResult> addCart(@RequestHeader("X-Authorization-Id") String userEmail,
                                                  @PathVariable Long productId, @RequestParam int count){
         AddCartResult addCartResult = cartService.addCart(userEmail,productId,count);
         return ResponseEntity.status(HttpStatus.OK).body(addCartResult);
@@ -34,14 +34,14 @@ public class CartController {
 
     @Operation(summary = "장바구니 삭제", description = "장바구니에 담긴 물품을 삭제한다")
     @DeleteMapping("/delete/{cartId}")
-    public ResponseEntity deleteCart(@PathVariable Long cartId){
+    public ResponseEntity<String> deleteCart(@PathVariable Long cartId){
         cartService.deleteCart(cartId);
         return ResponseEntity.status(HttpStatus.OK).body("장바구니 물품이 삭제되었습니다");
     }
 
     @Operation(summary = "장바구니 수정",description = "장바구니에 담긴 물품의 수량을 수정한다")
     @PutMapping("/update/{cartId}")
-    public ResponseEntity updateCart(@PathVariable Long cartId,
+    public ResponseEntity<String> updateCart(@PathVariable Long cartId,
                                      @RequestParam int count){
         cartService.updateCart(cartId,count);
         return ResponseEntity.status(HttpStatus.OK).body("장바구니 물품의 수량이 수정되었습니다");
@@ -61,7 +61,7 @@ public class CartController {
     }
 
     @DeleteMapping("/deleteAll")
-    public ResponseEntity deleteAllCart(@RequestParam("userEmail") String userEmail){
+    public ResponseEntity<String> deleteAllCart(@RequestParam("userEmail") String userEmail){
         log.info("[OrderService-CartService] open feign 통신이 성공하였습니다");
         cartService.deleteAllCart(userEmail);
         return ResponseEntity.status(HttpStatus.OK).body("장바구니 목록이 정상적으로 삭제되었습니다!");
