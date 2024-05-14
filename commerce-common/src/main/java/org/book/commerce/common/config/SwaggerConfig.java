@@ -1,4 +1,4 @@
-package org.book.commerce.userservice.config;
+package org.book.commerce.common.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.Components;
@@ -19,7 +19,7 @@ import java.util.List;
 public class SwaggerConfig {
 
     @Bean
-    public OpenAPI openAPI(@Value("${openapi.service.url}") String url){
+    public OpenAPI openAPI(){
         Info info = new Info().title("Ecommerce 서비스 API 명세")
                 .description("Ecommerce 서비스 이용 명세서입니다")
                 .contact(new Contact().email("dlahj1209@naver.com").name("LIMHEEJU")
@@ -40,7 +40,7 @@ public class SwaggerConfig {
         SecurityRequirement addSecurityItem = new SecurityRequirement();
         addSecurityItem.addList("Authorization"); // Authorization 헤더에 보안 스키마 추가
 
-        return new OpenAPI().servers(List.of(new Server().url(url))).components(new Components().addSecuritySchemes("Authorization",bearerAuth))
+        return new OpenAPI().components(new Components().addSecuritySchemes("Authorization",bearerAuth))
                 .addSecurityItem(addSecurityItem).info(info);
     }
 }
