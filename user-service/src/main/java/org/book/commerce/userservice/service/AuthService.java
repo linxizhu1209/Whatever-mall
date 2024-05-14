@@ -14,6 +14,7 @@ import org.book.commerce.common.util.AESUtil;
 import org.book.commerce.common.util.RedisUtil;
 import org.book.commerce.userservice.config.JwtTokenProvider;
 import org.book.commerce.userservice.domain.Users;
+import org.book.commerce.userservice.dto.EmailInfo;
 import org.book.commerce.userservice.dto.LoginInfo;
 import org.book.commerce.userservice.dto.SignupInfo;
 import org.book.commerce.userservice.repository.UsersRepository;
@@ -87,18 +88,21 @@ public class AuthService {
     public void registerUser(String key) {
 
         Users user = (Users) redisUtil.get(key);
-        if(user==null) throw new CommonException("인증시간이 만료되었습니다. 인증메일 재전송 버튼을 눌러주세요.", ErrorCode.UNAUTHORIZED_RESPONSE);
-        Users updateUser = usersRepository.findByEmail(user.getEmail()).orElseThrow(()->new NotFoundException("일치하는 회원을 찾을 수 없습니다."));
+        if(user==null) throw new CommonException("인증시간이 만료되었습니다. 가입하신 이메일 입력 후 인증메일 재전송 버튼을 눌러주세요.", ErrorCode.UNAUTHORIZED_RESPONSE);
+        Users updateUser = findUserByEmail(user.getEmail());
         updateUser.setRole(Users.Role.USER); // 회원으로 등록
         usersRepository.save(updateUser);
     }
-// todo : 만약 인증 시간 만료로 인증 못했을 시 다시 인증번호 전송하도록
+
+    public void resendEmail(EmailInfo emailInfo) {
+        String email = aesUtil.encrypt(emailInfo.getEmail());
+        Users user = findUserByEmail(email);
+        sendCodeToEmail(emailInfo.getEmail(),user);
+    }
 
     public ResponseEntity login(LoginInfo loginInfo, HttpServletResponse httpServletResponse) {
-        Users user = usersRepository.findByEmail(aesUtil.encrypt(loginInfo.getEmail())).orElseThrow(()->new NotFoundException("입력하신 이메일과 일치하는 회원이 존재하지 않습니다. 확인해주세요. 입력 이메일: "+loginInfo.getEmail()));// "이메일과 일치하는 유저가 존재하지않습니다. 확인해주세요"
-
+        Users user = findUserByEmail(loginInfo.getEmail());
         if(user.getRole()==null){
-            // todo 만약 인증확인 메일이 유효시간이 있다면, 다시 메일을 보내주는 작업을 추가
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("이메일 인증이 완료되지 않은 회원입니다. 이메일 인증을 완료해주세요");
         }
 
@@ -129,13 +133,12 @@ public class AuthService {
         return new UsernamePasswordAuthenticationToken(email,pwd);
     }
 
-    public ResponseEntity logout(String accessToken) {
+    public void logout(String accessToken) {
         Long expiration = jwtTokenProvider.getExpiration(accessToken);
         String email = jwtTokenProvider.getEmailByToken(accessToken);
         redisTemplate.opsForValue().set(accessToken,"logout",expiration, TimeUnit.MILLISECONDS);
         redisUtil.delete("RF: "+email);
-        return ResponseEntity.status(HttpStatus.OK).body("정상적으로 로그아웃되었습니다.");
-    }
+        }
 
     public ResponseEntity refresh(String token) {
         String email = jwtTokenProvider.getEmailByToken(token); // 암호화된 이메일
@@ -150,8 +153,12 @@ public class AuthService {
     }
 
     private String checkByToken(String email) {
-        Users user = usersRepository.findByEmail(email).orElseThrow(()->new NotFoundException("해당 회원을 찾을 수 없습니다."));
+        Users user = findUserByEmail(email);
         return jwtTokenProvider.createAccessToken(user);
+    }
+
+    public Users findUserByEmail(String email){
+        return usersRepository.findByEmail(email).orElseThrow(()->new NotFoundException("입력하신 이메일과 일치하는 회원이 존재하지 않습니다. 확인해주세요. 입력 이메일: "+email));
     }
 }
 

@@ -19,7 +19,7 @@ public class adminLoaderMPL implements CommandLineRunner {
     private final AESUtil aesUtil;
     private final UsersRepository usersRepository;
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         createDefaultUser();
     }
 

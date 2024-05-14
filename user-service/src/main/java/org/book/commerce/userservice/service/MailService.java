@@ -36,7 +36,7 @@ public class MailService {
         message.addRecipients(Message.RecipientType.TO,toEmail);
         message.setSubject(title);
         message.setContent("<h1>[이메일 인증]</h1> <p>아래 링크를 클릭하시면 이메일 인증이 완료됩니다.</p> " +
-                "<a href='http://localhost:8014/auth/signup/email-verifications?key="+key+"' target='_blenk'>이메일 인증 확인</a>", "text/html;charset=euc-kr"
+                "<a href='http://user-server:8014/auth/signup/email-verifications?key="+key+"' target='_blenk'>이메일 인증 확인</a>", "text/html;charset=euc-kr"
         );
         return message;
     }
