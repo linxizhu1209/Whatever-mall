@@ -15,9 +15,7 @@ import org.book.commerce.userservice.dto.SignupInfo;
 import org.book.commerce.userservice.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.TimeoutException;
@@ -33,7 +31,7 @@ public class AuthController {
 
     @Operation(summary = "회원가입",description = "이메일 인증을 통해 회원가입할 수 있다")
     @PostMapping("/signup")
-    public CommonResponseDto signup(@RequestBody SignupInfo signupInfo){
+    public CommonResponseDto signup(@Validated @RequestBody SignupInfo signupInfo){
         log.info("회원 가입 요청이 들어왔습니다");
         return authService.signup(signupInfo);
     }
@@ -45,7 +43,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body("회원인증이 성공하였습니다");
     }
 
-    // todo 인증메일 다시보내기
+
     @Operation(summary = "이메일 재인증",description = "이메일 재인증 메일 전송")
     @PutMapping("/resendEmail")
     public ResponseEntity<String> resendEmail(@RequestBody EmailInfo emailInfo){

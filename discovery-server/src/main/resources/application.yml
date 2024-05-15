@@ -1,7 +1,5 @@
-#  1. 유레카 서버의 port지정
 server:
   port: 8761
-#  유레카 서버의 고유 id를 지정
 spring:
   application:
     name: discovery-server

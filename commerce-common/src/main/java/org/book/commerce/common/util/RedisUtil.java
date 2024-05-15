@@ -3,6 +3,7 @@ package org.book.commerce.common.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,7 @@ public class RedisUtil {
     private RedisTemplate<String,Object> redisTemplate;
 
     public void set(String key,Object o, int minutes){
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(o.getClass()));
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         redisTemplate.opsForValue().set(key,o,minutes, TimeUnit.MINUTES);
     }
 

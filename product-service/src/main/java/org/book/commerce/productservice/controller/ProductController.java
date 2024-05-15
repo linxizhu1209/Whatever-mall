@@ -65,7 +65,6 @@ public class ProductController {
     @GetMapping("/cartProduct")
     public List<CartProductFeignResponse> findCartProductByProductId(@RequestParam("productId") final long[] productIdList){
         log.info("[Cart->Product] open feign 통신이 성공하였습니다");
-//        throw new CommonException("실패!!!!!!!");
         return productService.findCartProduct(productIdList);
     }
 
