@@ -9,13 +9,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OrderProductListDto {
-    @Schema(description = "주문한 물품 개수",example = "3")
     private int count;
-    @Schema(description = "물품이름",example = "장화신은고양이")
     private String productName;
-    @Schema(description = "물품가격",example = "15000")
     private long price;
-    @Schema(description = "물품고유번호",example = "1")
     private Long productId;
 
 }
