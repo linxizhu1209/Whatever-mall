@@ -101,7 +101,8 @@ public class AuthService {
     }
 
     public ResponseEntity login(LoginInfo loginInfo, HttpServletResponse httpServletResponse) {
-        Users user = findUserByEmail(loginInfo.getEmail());
+        String email = aesUtil.encrypt(loginInfo.getEmail());
+        Users user = findUserByEmail(email);
         if(user.getRole()==null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("이메일 인증이 완료되지 않은 회원입니다. 이메일 인증을 완료해주세요");
         }
