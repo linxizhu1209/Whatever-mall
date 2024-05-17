@@ -36,13 +36,14 @@ public class ProductService {
     private final ImageUploadService imageUploadService;
 
     @Transactional
-    public void addProduct(AddProductDto addProductDto) {
+    public ResponseAddProduct addProduct(AddProductDto addProductDto) {
         Product product = Product.builder().stock(addProductDto.getStock()).name(addProductDto.getName()).price(addProductDto.getPrice())
                 .description(addProductDto.getDescription())
                 .thumbnailName(addProductDto.getImageName()).thumbnailUrl(addProductDto.getImageUrl()).isLimitedEdition(addProductDto.getIsLimitedEdition())
                 .openDateTime(addProductDto.getOpenDateTime()).build();
         Long productId = productRepository.save(product).getProductId();
         imageUploadService.upload(productId, addProductDto.getImageName(), addProductDto.getImageUrl());
+        return ResponseAddProduct.builder().productId(productId).message("상품 추가가 완료되었습니다!").build();
         }
 
     @Transactional

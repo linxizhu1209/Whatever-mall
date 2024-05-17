@@ -19,9 +19,9 @@ public class ProductController {
 
     private final ProductService productService;
     @PostMapping("/admin/add")
-    public ResponseEntity<String> addProduct(@RequestBody AddProductDto addProductDto){
-        productService.addProduct(addProductDto);
-        return ResponseEntity.status(HttpStatus.OK).body("상품 추가가 완료되었습니다!");
+    public ResponseEntity<ResponseAddProduct> addProduct(@RequestBody AddProductDto addProductDto){
+        ResponseAddProduct response = productService.addProduct(addProductDto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/allproduct")
