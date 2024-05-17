@@ -2,6 +2,7 @@ package org.book.commerce.productservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.book.commerce.common.dto.CommonResponseDto;
 import org.book.commerce.common.exception.ConflictException;
 import org.book.commerce.common.exception.NotFoundException;
 import org.book.commerce.productservice.config.DistributedLock;
@@ -80,7 +81,7 @@ public class ProductService {
 
 
     @Transactional
-    public void editProduct(Long productId, EditProduct editProduct) {
+    public CommonResponseDto editProduct(Long productId, EditProduct editProduct) {
         Product product = findProductById(productId);
         if (editProduct.getDescription() != null) {
             product.setDescription(editProduct.getDescription());
@@ -102,6 +103,7 @@ public class ProductService {
             imageRepository.save(image);
         }
         productRepository.save(product);
+        return CommonResponseDto.builder().statusCode(200).success(true).message("상품 수정이 완료되었습니다.").build();
     }
 
     @Transactional

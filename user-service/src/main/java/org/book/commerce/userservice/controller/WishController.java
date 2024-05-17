@@ -2,6 +2,7 @@ package org.book.commerce.userservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.book.commerce.common.dto.CommonResponseDto;
 import org.book.commerce.userservice.dto.ProductFeignResponse;
 import org.book.commerce.userservice.service.WishService;
 import org.springframework.http.HttpStatus;
@@ -18,17 +19,17 @@ public class WishController {
 
     private final WishService wishService;
     @PostMapping("/add/{productId}")
-    public ResponseEntity<String> addWish(@RequestHeader("X-Authorization-Id") String userEmail, @PathVariable Long productId){
+    public ResponseEntity<CommonResponseDto> addWish(@RequestHeader("X-Authorization-Id") String userEmail, @PathVariable Long productId){
         log.info("[WishController] 찜 목록 추가 요청이 들어왔습니다");
-        wishService.addWish(userEmail,productId);
-        return ResponseEntity.status(HttpStatus.OK).body("찜 목록에 추가되었습니다!");
+        CommonResponseDto response = wishService.addWish(userEmail,productId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/delete/{productId}")
-    public ResponseEntity<String> deleteWish(@PathVariable Long productId,@RequestHeader("X-Authorization-Id") String userEmail){
+    public ResponseEntity<CommonResponseDto> deleteWish(@PathVariable Long productId,@RequestHeader("X-Authorization-Id") String userEmail){
         log.info("[WishController] 찜 목록 삭제 요청이 들어왔습니다");
-        wishService.deleteWish(userEmail,productId);
-        return ResponseEntity.status(HttpStatus.OK).body("찜 목록에서 삭제되었습니다!");
+        CommonResponseDto response = wishService.deleteWish(userEmail,productId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     @GetMapping("/list")
     public ResponseEntity<List<ProductFeignResponse>> getWishList(@RequestHeader("X-Authorization-Id") String userEmail){

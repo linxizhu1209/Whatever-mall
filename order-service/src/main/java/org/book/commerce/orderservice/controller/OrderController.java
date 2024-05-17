@@ -3,6 +3,7 @@ package org.book.commerce.orderservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.book.commerce.common.dto.CommonResponseDto;
 import org.book.commerce.orderservice.dto.ReqBuyProduct;
 import org.book.commerce.orderservice.dto.OrderResultDto;
 import org.book.commerce.orderservice.dto.OrderlistDto;
@@ -50,15 +51,15 @@ public class OrderController {
     }
 
     @PutMapping("/cancel/{orderId}")
-    public ResponseEntity<String> cancelOrder(@PathVariable Long orderId){
-        orderService.cancelOrder(orderId);
-        return ResponseEntity.status(HttpStatus.OK).body("주문 취소가 완료되었습니다!");
+    public ResponseEntity<CommonResponseDto> cancelOrder(@PathVariable Long orderId){
+        CommonResponseDto response = orderService.cancelOrder(orderId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/refund/{orderId}")
-    public ResponseEntity<String> refundOrder(@PathVariable Long orderId){
-        orderService.refundOrder(orderId);
-        return ResponseEntity.status(HttpStatus.OK).body("반품 신청이 완료되었습니다!");
+    public ResponseEntity<CommonResponseDto> refundOrder(@PathVariable Long orderId){
+        CommonResponseDto response = orderService.refundOrder(orderId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }

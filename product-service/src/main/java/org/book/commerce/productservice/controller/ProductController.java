@@ -2,6 +2,7 @@ package org.book.commerce.productservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.book.commerce.common.dto.CommonResponseDto;
 import org.book.commerce.productservice.dto.*;
 import org.book.commerce.productservice.service.ProductService;
 import org.springframework.http.HttpStatus;
@@ -40,9 +41,9 @@ public class ProductController {
     }
 
     @PutMapping("/admin/edit/{productId}")
-    public ResponseEntity<String> editProdcut(@PathVariable Long productId,@RequestBody EditProduct editProduct){
-        productService.editProduct(productId,editProduct);
-        return ResponseEntity.status(HttpStatus.OK).body("상품 수정이 완료되었습니다.");
+    public ResponseEntity<CommonResponseDto> editProdcut(@PathVariable Long productId,@RequestBody EditProduct editProduct){
+        CommonResponseDto response = productService.editProduct(productId,editProduct);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping()

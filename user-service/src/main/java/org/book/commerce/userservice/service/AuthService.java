@@ -85,19 +85,20 @@ public class AuthService {
     }
 
 
-    public void registerUser(String key) {
-
+    public CommonResponseDto registerUser(String key) {
         Users user = (Users) redisUtil.get(key);
         if(user==null) throw new CommonException("인증시간이 만료되었습니다. 가입하신 이메일 입력 후 인증메일 재전송 버튼을 눌러주세요.", ErrorCode.UNAUTHORIZED_RESPONSE);
         Users updateUser = findUserByEmail(user.getEmail());
         updateUser.setRole(Users.Role.USER); // 회원으로 등록
         usersRepository.save(updateUser);
+        return CommonResponseDto.builder().statusCode(200).success(true).message("회원인증이 성공하였습니다").build();
     }
 
-    public void resendEmail(EmailInfo emailInfo) {
+    public CommonResponseDto resendEmail(EmailInfo emailInfo) {
         String email = aesUtil.encrypt(emailInfo.getEmail());
         Users user = findUserByEmail(email);
         sendCodeToEmail(emailInfo.getEmail(),user);
+        return CommonResponseDto.builder().statusCode(200).success(true).message("이메일 인증 메일이 재전송되었습니다. 10분이내에 인증을 완료해주세요!").build();
     }
 
     public ResponseEntity login(LoginInfo loginInfo, HttpServletResponse httpServletResponse) {
@@ -134,11 +135,12 @@ public class AuthService {
         return new UsernamePasswordAuthenticationToken(email,pwd);
     }
 
-    public void logout(String accessToken) {
+    public CommonResponseDto logout(String accessToken) {
         Long expiration = jwtTokenProvider.getExpiration(accessToken);
         String email = jwtTokenProvider.getEmailByToken(accessToken);
         redisTemplate.opsForValue().set(accessToken,"logout",expiration, TimeUnit.MILLISECONDS);
         redisUtil.delete("RF: "+email);
+        return CommonResponseDto.builder().statusCode(200).success(true).message("정상적으로 로그아웃되었습니다.").build();
         }
 
     public ResponseEntity refresh(String token) {

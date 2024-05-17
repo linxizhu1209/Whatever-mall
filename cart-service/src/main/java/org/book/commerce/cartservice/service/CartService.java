@@ -7,6 +7,7 @@ import org.book.commerce.cartservice.dto.CartOrderFeignResponse;
 import org.book.commerce.cartservice.dto.CartProductFeignResponse;
 import org.book.commerce.cartservice.repository.CartRepository;
 import org.book.commerce.cartservice.domain.Cart;
+import org.book.commerce.common.dto.CommonResponseDto;
 import org.book.commerce.common.exception.ConflictException;
 import org.book.commerce.common.exception.NotFoundException;
 import org.springframework.stereotype.Service;
@@ -36,15 +37,17 @@ public class CartService {
         return new AddCartResult(cartId);
     }
     @Transactional
-    public void deleteCart(Long cartId){
+    public CommonResponseDto deleteCart(Long cartId){
         Cart cart = cartRepository.findById(cartId).orElseThrow(()->new NotFoundException("요청한 장바구니를 찾을 수 없습니다"));
         cartRepository.delete(cart);
+        return CommonResponseDto.builder().statusCode(200).success(true).message("장바구니 물품이 삭제되었습니다").build();
     }
     @Transactional
-    public void updateCart(Long cartId, int count) {
+    public CommonResponseDto updateCart(Long cartId, int count) {
         Cart cart = cartRepository.findById(cartId).orElseThrow(()->new NotFoundException("요청한 장바구니를 찾을 수 없습니다"));
         cart.setCount(count);
         cartRepository.save(cart);
+        return CommonResponseDto.builder().success(true).statusCode(200).message("장바구니 물품의 수량이 수정되었습니다").build();
     }
     @Transactional
     public List<CartListDto> getCartList(String userEmail) {

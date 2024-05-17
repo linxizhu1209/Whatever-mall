@@ -1,6 +1,7 @@
 package org.book.commerce.userservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.book.commerce.common.dto.CommonResponseDto;
 import org.book.commerce.userservice.dto.MyPageDto;
 import org.book.commerce.userservice.dto.UpdateInfo;
 import org.book.commerce.userservice.service.UserService;
@@ -22,8 +23,8 @@ public class UserController {
     }
 
     @PutMapping("/mypage/update")
-    public ResponseEntity<String> updateMypage(@RequestHeader("X-Authorization-Id") String userEmail, @Validated @RequestBody UpdateInfo updateInfo){
-        userService.updateMyPage(userEmail,updateInfo);
-        return ResponseEntity.status(HttpStatus.OK).body("회원정보 수정이 완료되었습니다");
+    public ResponseEntity<CommonResponseDto> updateMypage(@RequestHeader("X-Authorization-Id") String userEmail, @Validated @RequestBody UpdateInfo updateInfo){
+        CommonResponseDto response = userService.updateMyPage(userEmail,updateInfo);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

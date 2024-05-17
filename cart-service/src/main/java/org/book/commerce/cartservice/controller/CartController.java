@@ -6,6 +6,7 @@ import org.book.commerce.cartservice.dto.AddCartResult;
 import org.book.commerce.cartservice.dto.CartListDto;
 import org.book.commerce.cartservice.dto.CartOrderFeignResponse;
 import org.book.commerce.cartservice.service.CartService;
+import org.book.commerce.common.dto.CommonResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,16 +31,16 @@ public class CartController {
     }
 
     @DeleteMapping("/delete/{cartId}")
-    public ResponseEntity<String> deleteCart(@PathVariable Long cartId){
-        cartService.deleteCart(cartId);
-        return ResponseEntity.status(HttpStatus.OK).body("장바구니 물품이 삭제되었습니다");
+    public ResponseEntity<CommonResponseDto> deleteCart(@PathVariable Long cartId){
+        CommonResponseDto response = cartService.deleteCart(cartId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/update/{cartId}")
-    public ResponseEntity<String> updateCart(@PathVariable Long cartId,
+    public ResponseEntity<CommonResponseDto> updateCart(@PathVariable Long cartId,
                                      @RequestParam int count){
-        cartService.updateCart(cartId,count);
-        return ResponseEntity.status(HttpStatus.OK).body("장바구니 물품의 수량이 수정되었습니다");
+        CommonResponseDto response = cartService.updateCart(cartId,count);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/getCart")

@@ -29,15 +29,15 @@ public class AuthController {
     }
 
     @GetMapping("/signup/email-verifications")
-    public ResponseEntity<String> signupConfirm(@RequestParam("key") String key, HttpServletResponse response){
-        authService.registerUser(key);
-        return ResponseEntity.status(HttpStatus.OK).body("회원인증이 성공하였습니다");
+    public ResponseEntity<CommonResponseDto> signupConfirm(@RequestParam("key") String key){
+        CommonResponseDto response = authService.registerUser(key);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/resendEmail")
-    public ResponseEntity<String> resendEmail(@RequestBody EmailInfo emailInfo){
-        authService.resendEmail(emailInfo);
-        return ResponseEntity.status(HttpStatus.OK).body("이메일 인증 메일이 재전송되었습니다. 10분이내에 인증을 완료해주세요!");
+    public ResponseEntity<CommonResponseDto> resendEmail(@RequestBody EmailInfo emailInfo){
+        CommonResponseDto response = authService.resendEmail(emailInfo);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/login")
@@ -47,9 +47,9 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("X-TOKEN") String token){
-        authService.logout(token);
-        return ResponseEntity.status(HttpStatus.OK).body("정상적으로 로그아웃되었습니다.");
+    public ResponseEntity<CommonResponseDto> logout(@RequestHeader("X-TOKEN") String token){
+        CommonResponseDto response = authService.logout(token);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/refresh")

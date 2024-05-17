@@ -2,6 +2,7 @@ package org.book.commerce.orderservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.book.commerce.common.dto.CommonResponseDto;
 import org.book.commerce.orderservice.dto.ReqBuyProduct;
 import org.book.commerce.common.exception.ConflictException;
 import org.book.commerce.common.exception.NotAcceptException;
@@ -46,7 +47,7 @@ public class OrderService {
         return orderlistDtos;
     }
 
-    public void cancelOrder(Long orderId) {
+    public CommonResponseDto cancelOrder(Long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("요청한 주문을 찾을 수 없습니다. 문제 주문 번호: " + orderId));
         if (order.getStatus() == OrderStatus.ORDER_COMPLETE) {
             order.setStatus(OrderStatus.REQ_CANCEL);
@@ -54,9 +55,10 @@ public class OrderService {
         } else {
             throw new NotAcceptException("배송중인 상품으로 주문 취소가 불가능합니다.");
         }
+        return CommonResponseDto.builder().statusCode(200).success(true).message("주문 취소가 완료되었습니다!").build();
     }
 
-    public void refundOrder(Long orderId) {
+    public CommonResponseDto refundOrder(Long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("존재하지 않는 주문입니다."));
         if (order.getStatus() == OrderStatus.FINISH_SHIPPING) {
             order.setStatus(OrderStatus.REQ_REFUND);
@@ -64,6 +66,7 @@ public class OrderService {
         } else {
             throw new NotAcceptException("반품이 불가능한 상태입니다.");
         }
+        return CommonResponseDto.builder().statusCode(200).success(true).message("반품 신청이 완료되었습니다!").build();
     }
 
     @Transactional

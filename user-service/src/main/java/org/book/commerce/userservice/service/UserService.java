@@ -1,6 +1,7 @@
 package org.book.commerce.userservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.book.commerce.common.dto.CommonResponseDto;
 import org.book.commerce.common.exception.NotFoundException;
 import org.book.commerce.common.util.AESUtil;
 import org.book.commerce.userservice.domain.Users;
@@ -25,7 +26,7 @@ public class UserService {
                 .phonenum(aesUtil.decrypt(user.getPhoneNum())).build();
     }
 
-    public void updateMyPage(String email, UpdateInfo updateInfo) {
+    public CommonResponseDto updateMyPage(String email, UpdateInfo updateInfo) {
         Users user = usersRepository.findByEmail(email).orElseThrow(()->new NotFoundException("회원을 찾을 수 없습니다."));
         String address = updateInfo.getAddress();
         String password = updateInfo.getPassword();
@@ -40,5 +41,6 @@ public class UserService {
             user.setPhoneNum(aesUtil.encrypt(phoneNum));
         }
         usersRepository.save(user);
+        return CommonResponseDto.builder().success(true).statusCode(200).message("회원정보 수정이 완료되었습니다").build();
     }
 }
