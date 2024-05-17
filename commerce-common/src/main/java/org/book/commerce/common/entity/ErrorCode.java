@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
-    BAD_REQUEST("400","Bad Request Error", HttpStatus.BAD_REQUEST),
     UNAUTHORIZED_RESPONSE("401","Unauthorized Error",HttpStatus.UNAUTHORIZED),
     INVALID_EMAIL("409","Send Failed Error",HttpStatus.CONFLICT);
 
