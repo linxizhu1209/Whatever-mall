@@ -1,9 +1,7 @@
 package org.book.commerce.productservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.*;
 
-import java.io.Serializable;
 
 @Builder
 @Getter

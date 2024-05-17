@@ -3,8 +3,6 @@ package org.book.commerce.orderservice.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.book.commerce.orderservice.dto.ReqBuyProduct;
-import org.book.commerce.common.entity.ErrorCode;
-import org.book.commerce.common.exception.CommonException;
 import org.book.commerce.common.exception.ConflictException;
 import org.book.commerce.common.exception.NotAcceptException;
 import org.book.commerce.common.exception.NotFoundException;
@@ -54,7 +52,7 @@ public class OrderService {
             order.setStatus(OrderStatus.REQ_CANCEL);
             orderRepository.save(order);
         } else {
-            throw new CommonException("배송중인 상품으로 주문 취소가 불가능합니다.", ErrorCode.BAD_REQUEST);
+            throw new NotAcceptException("배송중인 상품으로 주문 취소가 불가능합니다.");
         }
     }
 

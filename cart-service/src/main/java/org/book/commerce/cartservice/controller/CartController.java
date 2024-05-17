@@ -1,7 +1,5 @@
 package org.book.commerce.cartservice.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.book.commerce.cartservice.dto.AddCartResult;
@@ -19,12 +17,11 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name="장바구니 API",description = "물품을 장바구니에 담고 조회,삭제,수정할 수 있는 API입니다")
 @RequestMapping("/cart")
 public class CartController {
 
     private final CartService cartService;
-    @Operation(summary = "장바구니 추가", description = "장바구니에 물품을 추가한다")
+
     @PostMapping("/add/{productId}")
     public ResponseEntity<AddCartResult> addCart(@RequestHeader("X-Authorization-Id") String userEmail,
                                                  @PathVariable Long productId, @RequestParam int count){
@@ -32,14 +29,12 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(addCartResult);
     }
 
-    @Operation(summary = "장바구니 삭제", description = "장바구니에 담긴 물품을 삭제한다")
     @DeleteMapping("/delete/{cartId}")
     public ResponseEntity<String> deleteCart(@PathVariable Long cartId){
         cartService.deleteCart(cartId);
         return ResponseEntity.status(HttpStatus.OK).body("장바구니 물품이 삭제되었습니다");
     }
 
-    @Operation(summary = "장바구니 수정",description = "장바구니에 담긴 물품의 수량을 수정한다")
     @PutMapping("/update/{cartId}")
     public ResponseEntity<String> updateCart(@PathVariable Long cartId,
                                      @RequestParam int count){
@@ -47,7 +42,6 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body("장바구니 물품의 수량이 수정되었습니다");
     }
 
-    @Operation(summary = "장바구니 조회",description = "장바구니에 담긴 물품들을 조회한다")
     @GetMapping("/getCart")
     public ResponseEntity<List<CartListDto>> getCartlist(@RequestHeader("X-Authorization-Id") String userEmail){
         List<CartListDto> cartListDto = cartService.getCartList(userEmail);
