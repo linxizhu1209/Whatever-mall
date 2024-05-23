@@ -49,7 +49,6 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
             String requestUri = request.getURI().getPath();
-            log.info("요청한 uri : "+request.getURI());
             String requiredRole;
             AntPathMatcher pathMatcher = new AntPathMatcher();
             if(Arrays.stream(Config.USER_URL).anyMatch(pattern-> pathMatcher.match(pattern,requestUri))){
@@ -63,7 +62,6 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             if(!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) return onError(exchange,"No authorization header",HttpStatus.UNAUTHORIZED);
             String authorizationHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
             String jwt = authorizationHeader.replace("Bearer ","");
-            log.info(jwt);
             if(!validationToken(jwt)) return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
             String userRole = resolveTokenRole(jwt).replace("[","").replace("]","");
             if(requiredRole.equalsIgnoreCase("ADMIN")){
