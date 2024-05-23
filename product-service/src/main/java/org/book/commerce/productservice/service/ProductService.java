@@ -127,7 +127,6 @@ public class ProductService {
     }
 
     @Transactional
-    @DistributedLock(key = "#productId")
     @Cacheable(value = "productStockCache",key = "#productId",cacheManager = "redisCacheManager")
     public ProductStockDetail getProductStock(Long productId) {
         Product product = findProductById(productId);
@@ -142,7 +141,7 @@ public class ProductService {
     /**
      * 밑에는 write-back 로직
      */
-
+//
     @Transactional
     @DistributedLock(key = "#productId")
     @CachePut(value = "productStockCache",key = "#orderProduct.productId", cacheManager = "redisCacheManager")
@@ -235,6 +234,7 @@ public class ProductService {
     /**
      * 밑에부터는 스케쥴러의 cache 삭제 db 업데이트 로직
      */
+    @Transactional
     public void synchronizeDB() {
         Set<String> redisKeys = getKeysWithPattern("productStockCache::*");
         List<ProductStockDetail> productToSync = new ArrayList<>();
@@ -301,8 +301,8 @@ public class ProductService {
 //        return ProductStockDetail.builder().productId(product.getProductId())
 //                .productName(product.getName()).modified(true).stock(changedStock).build();
 //    }
-//
-//
+
+
 //    @Transactional
 ////    @DistributedLock(key = "#productId")
 ////    @CachePut(value = "productStockCache",key = "#orderProduct.productId", cacheManager = "redisCacheManager")
