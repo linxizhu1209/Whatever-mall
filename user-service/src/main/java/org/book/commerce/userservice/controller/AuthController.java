@@ -4,14 +4,20 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.book.commerce.common.dto.CommonResponseDto;
+import org.book.commerce.common.exception.CustomValidationException;
 import org.book.commerce.userservice.dto.EmailInfo;
 import org.book.commerce.userservice.dto.LoginInfo;
 import org.book.commerce.userservice.dto.SignupInfo;
 import org.book.commerce.userservice.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @RequiredArgsConstructor
@@ -23,8 +29,16 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public CommonResponseDto signup(@Validated @RequestBody SignupInfo signupInfo){
+    public CommonResponseDto signup(@Validated @RequestBody SignupInfo signupInfo,
+                                    BindingResult bindingResult){
         log.info("회원 가입 요청이 들어왔습니다");
+        if(bindingResult.hasErrors()){
+            Map<String,String> errors = new HashMap<>();
+            for(FieldError error: bindingResult.getFieldErrors()){
+                errors.put(error.getField(),error.getDefaultMessage());
+            }
+            throw new CustomValidationException("회원가입 유효성 검사에 실패하였습니다.",errors);
+        }
         return authService.signup(signupInfo);
     }
 

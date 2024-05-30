@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class SignupInfo {
 
  @NotNull
- @Email
+ @Email(message = "이메일 형식이 잘못되었습니다! 이메일은 xxx@naver.com 형식으로 작성되어야 합니다.")
  private String email;
 
  @NotNull

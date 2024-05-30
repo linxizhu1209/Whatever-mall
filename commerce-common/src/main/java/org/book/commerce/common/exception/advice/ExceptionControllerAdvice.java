@@ -58,4 +58,12 @@ public class ExceptionControllerAdvice {
         String responseJson = feignException.contentUTF8();
         return ResponseEntity.status(feignException.status()).body(responseJson);
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(CustomValidationException.class)
+    public Map<String,String> validationException(CustomValidationException e){
+        log.error("Client 요청에 문제가 있어 다음처럼 출력합니다. : "+e.getMessage());
+        return e.getErrors();
+    }
+
 }
