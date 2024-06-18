@@ -5,10 +5,10 @@ services:
     container_name: ecommerce-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: ecommerce
-      MYSQL_USER: heeju
-      MYSQL_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER_NAME}
+      MYSQL_PASSWORD: ${DB_USER_PWD}
       TZ: 'Asia/Seoul'
     ports:
       - "3307:3306"
@@ -37,10 +37,10 @@ services:
     environment:
       SPRING_APPLICATION_NAME: config-server
       SPRING_CONFIG_LOCATION: /application.yml
-      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/linxizhu1209/config-repo
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: ${CONFIG_GIT_URL}
       SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT-LABEL: master
       SPRING_CLOUD_CONFIG_SERVER_GIT_BOOTSTRAP: true
-      ENCRYPT_KEY: "djklsafwakkldsf2152saf"
+      ENCRYPT_KEY: ${ENCRYPT_KEY}
 #    volumes:
 #      - /config-server/src/main/resources/:/app/
   discovery-server:
