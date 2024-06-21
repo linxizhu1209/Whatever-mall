@@ -11,6 +11,8 @@
 - Spring Cloud Config 구성하여 여러 서버의 설정파일을 중앙 관리화 
 - Spring Cloud Eureka 구성하여 확장성과 안정성을 확보
 - Spring Cloud Openfeign을 활용하여 서버 간 통신
+- Spring Cloud resilience4j를 사용하여 서킷브레이커로 회복탄력성 확보
+- Spring Actuator를 사용해 성능 모니터링
 - Redis Cache를 이용해 대량의 트래픽 요청에도 빠른 응답 가능 
 - Redis Redisson을 활용한 동시성 제어
 - Scheduler를 활용하여 주문상태 주기적 관리 및 Redis Cache와 Database 동기화
