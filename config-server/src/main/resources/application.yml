@@ -10,6 +10,8 @@ spring:
         git:
           uri: https://github.com/linxizhu1209/config-repo
           default-label: master
+          cloneOnStart: true
+          basedir: /path/to/local/git/cache
         bootstrap: true
 encrypt:
   key: ${ENCRYPT_KEY}
