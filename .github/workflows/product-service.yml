@@ -33,7 +33,8 @@ jobs:
         run: ./gradlew test -p product-service
 
       - name: Build Docker image
-        run: docker build -t product-service:latest ./product-service
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/product-service:latest -f ./product-service/Dockerfile ./product-service
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -41,4 +42,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/user-service:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/product-service:latest

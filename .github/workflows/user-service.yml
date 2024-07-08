@@ -32,7 +32,7 @@ jobs:
         run: ./gradlew test -p user-service
 
       - name: Build Docker image
-        run: docker build -t user-service:latest ./user-service
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/user-service:latest -f ./user-service/Dockerfile ./user-service
 
 
       - name: Log in to Docker Hub
