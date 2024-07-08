@@ -23,18 +23,17 @@ jobs:
           java-version: '21'
           distribution: "adopt"
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
       - name: Build with Gradle
-        run: ./gradlew build
-        working-directory: ./product-service
+        run: ./gradlew build -p product-service
 
       - name: Test with Gradle
-        run: ./gradlew test
-        working-directory: ./product-service
+        run: ./gradlew test -p product-service
 
       - name: Build Docker image
-        run: docker build -t product-service:latest .
-        working-directory: ./product-service
-
+        run: docker build -t product-service:latest ./product-service
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:

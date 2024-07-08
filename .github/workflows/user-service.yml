@@ -21,6 +21,9 @@ jobs:
           java-version: '21'
           distribution: "adopt"
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
       - name: Build with Gradle
         run: ./gradlew build -p user-service
 
@@ -29,7 +32,7 @@ jobs:
         run: ./gradlew test -p user-service
 
       - name: Build Docker image
-        run: docker build -t user-service:latest .
+        run: docker build -t user-service:latest ./user-service
 
 
       - name: Log in to Docker Hub
