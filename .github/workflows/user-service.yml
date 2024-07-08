@@ -22,16 +22,15 @@ jobs:
           distribution: "adopt"
 
       - name: Build with Gradle
-        run: ./gradlew build
-        working-directory: ./user-service
+        run: ./gradlew build -p user-service
+
 
       - name: Test with Gradle
-        run: ./gradlew test
-        working-directory: ./user-service
+        run: ./gradlew test -p user-service
 
       - name: Build Docker image
         run: docker build -t user-service:latest .
-        working-directory: ./user-service
+
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
