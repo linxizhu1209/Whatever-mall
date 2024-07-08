@@ -26,6 +26,7 @@ dependencies {
 
 	//redisson 의존성
 	implementation 'org.redisson:redisson-spring-boot-starter:3.18.0'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 }
 
 dependencyManagement {

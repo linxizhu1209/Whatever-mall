@@ -1,0 +1,45 @@
+global:
+  scrape_interval: 15s  # 기본 스크레이핑 간격
+
+scrape_configs:
+  - job_name: 'user-service'
+    metrics_path: '/user/secret/prometheus'
+    static_configs:
+      - targets: ['user-server:8014']
+        labels:
+          service: 'user'
+
+  - job_name: 'auth-service'
+    metrics_path: '/auth/secret/prometheus'
+    static_configs:
+      - targets: ['user-server:8014']
+        labels:
+          service: 'auth'
+
+  - job_name: 'wish-service'
+    metrics_path: '/wish/secret/prometheus'
+    static_configs:
+      - targets: ['user-server:8014']
+        labels:
+          service: 'wish'
+
+  - job_name: 'product-service'
+    metrics_path: '/product/secret/prometheus'
+    static_configs:
+      - targets: ['product-server:8013']
+        labels:
+          service: 'product'
+
+  - job_name: 'cart-service'
+    metrics_path: '/cart/secret/prometheus'
+    static_configs:
+      - targets: ['cart-server:8011']
+        labels:
+          service: 'cart'
+
+  - job_name: 'order-service'
+    metrics_path: '/order/secret/prometheus'
+    static_configs:
+      - targets: ['order-server:8012']
+        labels:
+          service: 'order'runtimeOnly 'io.micrometer:micrometer-registry-prometheus'runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
