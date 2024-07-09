@@ -15,13 +15,13 @@ import java.time.LocalDateTime;
 public class Scheduler {
     private final OrderService orderService;
 
-    @Scheduled(cron="0 */30 * * * *") // 30분에 한번씩
+    @Scheduled(cron="0 */30 * * * *")
     public void exceedDay(){
         log.info("[Confirm OrderStatus] 스케쥴러 작동중: 현재시각 : "+ LocalDateTime.now());
         orderService.exceedOrderDay();
     }
 
-    @Scheduled(cron="0 */1 * * * *") // 1분에 한번씩
+    @Scheduled(cron="0 */1 * * * *")
     public void overPaymentDeadLine(){
         log.info("[Confirm PaymentDeadline] 스케쥴러 작동중: 현재시각 : "+ LocalDateTime.now());
         orderService.overPaymentDeadLine();

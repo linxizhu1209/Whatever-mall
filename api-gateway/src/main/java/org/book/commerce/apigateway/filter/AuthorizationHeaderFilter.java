@@ -127,11 +127,6 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             return new BCryptPasswordEncoder();
         }
 
-        public static final String[] PERMIT_URL = {
-                "/","/**","/auth/**","/css/**","/images/**","/js/**","/favicon.ico","/h2-console/**"
-                ,"/swagger-ui.html","/swagger-ui/**","/api-docs/**","/v3/**","/auth/login/**","/product/**"
-                ,"/eureka"
-        };
         public static final String[] USER_URL = {
                  "/auth/logout","/cart/**","/order/**","/wish/**","/user/**"
         };

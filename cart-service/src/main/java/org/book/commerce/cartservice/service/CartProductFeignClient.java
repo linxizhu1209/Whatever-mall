@@ -29,12 +29,10 @@ public interface CartProductFeignClient {
 
 
     default List<CartProductFeignResponse> fallbackFindProductByProductId(long[] productIdList, Throwable t) {
-        // 오류 메시지 반환
         throw new CommonException("지금 연결이 원활하지 않습니다. 잠시 후 다시 시도해주세요.", ErrorCode.SERVICE_UNAVAILABLE);
     }
 
     default ResponseEntity<String> fallbackIsExistProduct(Long productId, Throwable t) {
-        // 오류 메시지 반환
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body("지금 연결이 원활하지 않습니다. 잠시 후 다시 시도해주세요.");
     }
