@@ -11,6 +11,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      DB_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_USER_NAME: ${{ secrets.DB_USER_NAME }}
+      DB_USER_PWD: ${{ secrets.DB_USER_PWD }}
+      CONFIG_GIT_URL: ${{ secrets.CONFIG_GIT_URL }}
+      ENCRYPT_KEY: ${{ secrets.ENCRYPT_KEY }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
