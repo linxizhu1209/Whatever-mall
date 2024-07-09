@@ -43,3 +43,9 @@ jobs:
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/product-service:latest
+
+      - name: Deploy with Docker Compose
+        run: |
+          docker-compose pull product-server
+          docker-compose up -d product-server
+        working-directory: ./
