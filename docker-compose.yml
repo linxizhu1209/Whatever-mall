@@ -27,7 +27,7 @@ services:
     command: ["redis-server", "--appendonly", "yes"]
 
   config-server:
-    image: config-server:latest
+    image: ${DOCKER_USERNAME}/config-server:latest
     restart: on-failure
     ports:
       - "8081:8081"
