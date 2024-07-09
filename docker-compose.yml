@@ -42,7 +42,7 @@ services:
 #    volumes:
 #      - /config-server/src/main/resources/:/app/
   discovery-server:
-    image: discovery-server:latest
+    image: ${DOCKER_USERNAME}/discovery-server:latest
     ports:
       - 8761:8761
     depends_on:
@@ -60,7 +60,7 @@ services:
       retries: 3
       start_period: 30s
   api-gateway:
-    image: api-gateway:latest
+    image: ${DOCKER_USERNAME}/api-gateway:latest
     ports:
       - 8080:8080
     depends_on:
@@ -78,7 +78,7 @@ services:
       retries: 3
       start_period: 30s
   common-server:
-    image: common-server:latest
+    image: ${DOCKER_USERNAME}/common-service:latest
     ports:
       - 8020:8020
     networks:
@@ -134,7 +134,7 @@ services:
     restart: on-failure
 
   cart-server:
-    image: cart-server:latest
+    image: ${DOCKER_USERNAME}/cart-service:latest
     ports:
       - 8011:8011
     networks:
@@ -152,7 +152,7 @@ services:
     restart: on-failure
 
   order-server:
-    image: order-server:latest
+    image: ${DOCKER_USERNAME}/order-service:latest
     ports:
       - 8012:8012
     networks:
