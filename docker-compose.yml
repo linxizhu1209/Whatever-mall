@@ -38,7 +38,6 @@ services:
       SPRING_CONFIG_LOCATION: /application.yml
       SPRING_CLOUD_CONFIG_SERVER_GIT_URI: ${CONFIG_GIT_URL}
       SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT-LABEL: master
-      SPRING_CLOUD_CONFIG_SERVER_GIT_BOOTSTRAP: true
       ENCRYPT_KEY: ${ENCRYPT_KEY}
 #    volumes:
 #      - /config-server/src/main/resources/:/app/
