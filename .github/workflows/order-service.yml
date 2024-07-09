@@ -1,4 +1,4 @@
-name: CI/CD for Cart Service
+name: CI/CD for Order Service
 
 on:
   push:

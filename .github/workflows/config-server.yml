@@ -4,9 +4,14 @@ on:
   push:
     branches:
       - dev
+    paths:
+      - config-server/**
+
   pull_request:
     branches:
       - dev
+    paths:
+      - config-server/**
 
 jobs:
   build:
