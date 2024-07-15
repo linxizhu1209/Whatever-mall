@@ -1,3 +1,4 @@
+FROM openjdk:21-jdk-slim
 # JAR 파일 빌드 시 사용되는 변수
 ARG JAR_FILE=build/libs/*.jar
 
