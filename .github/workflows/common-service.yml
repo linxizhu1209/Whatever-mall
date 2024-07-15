@@ -42,11 +42,11 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build -p common-server
+        run: ./gradlew build -p commerce-common
 
 
       - name: Test with Gradle
-        run: ./gradlew test -p common-server
+        run: ./gradlew test -p commerce-common
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -61,11 +61,11 @@ jobs:
 
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/common-server:latest -f ./common-server/Dockerfile ./common-server
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/commerce-common:latest -f ./commerce-common/Dockerfile ./commerce-common
 
 
       - name: Tag Docker image for ECR
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/common-server:latest ${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/commerce-common:latest ${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
       - name: Push Docker image to ECR
         run: docker push ${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest

@@ -38,9 +38,7 @@ bootJar {
 	enabled = true
 	mainClass = "org.book.commerce.common.CommonServiceApplication"
 }
-//jar {
-//	enabled = true
-//}
+
 
 dependencyManagement {
 	imports {
