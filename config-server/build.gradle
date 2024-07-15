@@ -10,7 +10,7 @@ dependencies {
 
 bootJar {
     enabled = true
-    mainClass = "org.configserver.ConfigServerApplication"
+    mainClass = "org.book.commerce.configserver.ConfigServerApplication"
 }
 jar {
     enabled = false

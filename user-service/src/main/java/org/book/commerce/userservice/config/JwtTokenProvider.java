@@ -62,7 +62,7 @@ public class JwtTokenProvider {
     public Long getExpiration(String accessToken) {
         Date expiration = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(accessToken)
                 .getBody().getExpiration();
-        return expiration.getTime()-new Date().getTime(); 
+        return expiration.getTime()-new Date().getTime();
 
     }
 
