@@ -77,7 +77,7 @@ public class AuthService {
 
     public void sendCodeToEmail(String toEmail, Users user){
 
-        String title = "Whatever with me 이메일 인증 확인";
+        String title = "Whatever-mall 이메일 인증 확인";
         String authCode = UUID.randomUUID().toString();
         if(mailService.sendEmail(toEmail,title,authCode)){
             redisUtil.set(authCode,user,10);
