@@ -31,12 +31,16 @@ public class MailService {
         return true;
     }
 
+    private String getApiGatewayUrl() {
+        return System.getenv("API_GATEWAY_URL");
+    }
     private MimeMessage createEmailForm(String toEmail,String title,String key) throws MessagingException {
+        String apiGatewayUrl = getApiGatewayUrl();
         MimeMessage message = new MimeMessage(session);
         message.addRecipients(Message.RecipientType.TO,toEmail);
         message.setSubject(title);
         message.setContent("<h1>[이메일 인증]</h1> <p>아래 링크를 클릭하시면 이메일 인증이 완료됩니다.</p> " +
-                "<a href='http://localhost:8014/auth/signup/email-verifications?key="+key+"' target='_blenk'>이메일 인증 확인</a>", "text/html;charset=euc-kr"
+                "<a href='" + apiGatewayUrl + "/auth/signup/email-verifications?key=" + key + "' target='_blenk'>이메일 인증 확인</a>", "text/html;charset=euc-kr"
         );
         return message;
     }
