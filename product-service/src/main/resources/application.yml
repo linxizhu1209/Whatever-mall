@@ -6,4 +6,7 @@ spring:
   application:
     name: application-product
   config:
-    import: "optional:configserver:http://config-server:8081/"
+    import: "optional:configserver:${CONFIG_SERVER_URL}"
+logging:
+  level:
+    org.springframework.cloud.config: DEBUG
