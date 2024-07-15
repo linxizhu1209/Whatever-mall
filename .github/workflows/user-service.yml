@@ -26,7 +26,8 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
       ECR_REPOSITORY: 'api-gateway'
-
+      AWS_SECRET_ACCESS_KEY : ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS-ACCESS-KEY-ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -52,7 +53,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Log in to Amazon ECR
         id: login-ecr
@@ -64,10 +65,10 @@ jobs:
 
 
       - name: Tag Docker image for ECR
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest ${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
       - name: Push Docker image to ECR
-        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+        run: docker push ${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
       - name: Deploy with Docker Compose
         run: |
