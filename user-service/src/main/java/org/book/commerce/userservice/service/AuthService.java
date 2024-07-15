@@ -89,7 +89,7 @@ public class AuthService {
         Users user = (Users) redisUtil.get(key);
         if(user==null) throw new CommonException("인증시간이 만료되었습니다. 가입하신 이메일 입력 후 인증메일 재전송 버튼을 눌러주세요.", ErrorCode.UNAUTHORIZED_RESPONSE);
         Users updateUser = findUserByEmail(user.getEmail());
-        updateUser.setRole(Users.Role.USER); 
+        updateUser.setRole(Users.Role.USER);
         usersRepository.save(updateUser);
         return CommonResponseDto.builder().statusCode(200).success(true).message("회원인증이 성공하였습니다").build();
     }
