@@ -26,7 +26,7 @@ public class JwtTokenProvider {
     @Value("${spring.jwt.secret}")
     private String secretKey;
 
-    private final String AUTHORITIES_KEY = "roles"; // todo 추후 수정
+    private final String AUTHORITIES_KEY = "roles";
     private final Long ACCESS_TOKEN_EXPIRED_TIME = 60*60*1000L;
     private final Long REFRESH_TOKEN_EXPIRED_TIME = 7*24*60*60*1000L;
 
@@ -62,7 +62,7 @@ public class JwtTokenProvider {
     public Long getExpiration(String accessToken) {
         Date expiration = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(accessToken)
                 .getBody().getExpiration();
-        return expiration.getTime()-new Date().getTime(); // 만료시간에서 현재 시간을 뺀 만큼 로그아웃된 토큰을 블랙리스트해줄거임
+        return expiration.getTime()-new Date().getTime(); 
 
     }
 

@@ -65,13 +65,13 @@ jobs:
 
 
       - name: Tag Docker image for ECR
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest ${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/user-service:latest ${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
       - name: Push Docker image to ECR
         run: docker push ${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
       - name: Deploy with Docker Compose
         run: |
-          docker-compose pull api-gateway
-          docker-compose up -d api-gateway
+          docker-compose pull user-service
+          docker-compose up -d user-service
         working-directory: ./
