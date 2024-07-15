@@ -23,7 +23,11 @@ jobs:
       CONFIG_GIT_URL: ${{ secrets.CONFIG_GIT_URL }}
       ENCRYPT_KEY: ${{ secrets.ENCRYPT_KEY }}
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+      ECR_REPOSITORY: 'api-gateway'
+      AWS_SECRET_ACCESS_KEY : ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
 
     steps:
       - name: Checkout code
@@ -45,21 +49,24 @@ jobs:
       - name: Test with Gradle
         run: ./gradlew test -p api-gateway
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest -f ./api-gateway/Dockerfile ./api-gateway
 
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Tag Docker image for ECR
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest ${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
-      - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest
-
-      - name: Deploy with Docker Compose
-        run: |
-          docker-compose pull api-gateway
-          docker-compose up -d api-gateway
-        working-directory: ./
+      - name: Push Docker image to ECR
+        run: docker push ${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest

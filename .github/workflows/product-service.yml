@@ -17,6 +17,7 @@ jobs:
 
     runs-on: ubuntu-latest
 
+
     env:
       DB_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }}
       DB_NAME: ${{ secrets.DB_NAME }}
@@ -25,17 +26,14 @@ jobs:
       CONFIG_GIT_URL: ${{ secrets.CONFIG_GIT_URL }}
       ENCRYPT_KEY: ${{ secrets.ENCRYPT_KEY }}
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+      ECR_REPOSITORY: 'product-server'
+      AWS_SECRET_ACCESS_KEY : ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-#      - name: Load environment variables from .env file
-#        run: |
-#          echo "Loading environment variables from .env file"
-#          set -o allexport
-#          source .env
-#          set +o allexport
 
       - name: Set up JDK 21
         uses: actions/setup-java@v2
@@ -49,23 +47,28 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -p product-service
 
+
       - name: Test with Gradle
         run: ./gradlew test -p product-service
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
 
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/product-service:latest -f ./product-service/Dockerfile ./product-service
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/product-service:latest
+      - name: Tag Docker image for ECR
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/product-service:latest ${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
-      - name: Deploy with Docker Compose
-        run: |
-          docker-compose pull product-server
-          docker-compose up -d product-server
-        working-directory: ./
+      - name: Push Docker image to ECR
+        run: docker push ${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest

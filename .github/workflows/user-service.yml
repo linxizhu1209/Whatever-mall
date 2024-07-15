@@ -25,7 +25,7 @@ jobs:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-      ECR_REPOSITORY: 'api-gateway'
+      ECR_REPOSITORY: 'user-server'
       AWS_SECRET_ACCESS_KEY : ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
     steps:
@@ -69,9 +69,3 @@ jobs:
 
       - name: Push Docker image to ECR
         run: docker push ${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
-
-      - name: Deploy with Docker Compose
-        run: |
-          docker-compose pull user-service
-          docker-compose up -d user-service
-        working-directory: ./
