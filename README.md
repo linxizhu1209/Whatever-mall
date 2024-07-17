@@ -1,9 +1,13 @@
 # Whatever-mall 프로젝트(24.4.17~24.5.17)
 일반 상품부터 한정판매 상품까지 무엇이든지 구매할 수 있는 eCommerce 플랫폼
+
+
+
 ## 💁‍♀️프로젝트 소개
 마이크로서비스 아키텍처로 프로젝트를 구성하여 서비스간 독립성을 확보하고, 
 재고 데이터 저장에 Redis를 활용해 한정판매 상품에 대규모 트래픽이 몰리더라도 빠른 재고 조회와 빠른 물품 구매를 지원하여, 고객의 불편을 최소화하고 만족도를 높여 고객이 원하는 것은 무엇이든지 구매할 수 있는 환경을 제공하고자 하였습니다.
 
+![Whatever-mall_Architecture.jpg](..%2F..%2FWhatever-mall_Architecture.jpg)
 -----
 ## 💻주요 기능
 - MSA로 구성하여 장애 발생의 범위를 최소화 
@@ -20,9 +24,7 @@
 -------------
 ## ⛓️ERD
 ![e-commerce](https://github.com/linxizhu1209/Whatever-mall/assets/146171215/c468a98f-3b26-441d-9706-b2f0d3202f9c)
------------
-## 🖌️ Architecture Diagram
-![Whatever-mall_Architecture.jpg](..%2F..%2FWhatever-mall_Architecture.jpg)
+
 -----------
 ## 📝API 문서 
 [Whatever-mall API (Postman)](https://documenter.getpostman.com/view/30411399/2sA3JT1xnA)
