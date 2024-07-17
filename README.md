@@ -7,7 +7,7 @@
 마이크로서비스 아키텍처로 프로젝트를 구성하여 서비스간 독립성을 확보하고, 
 재고 데이터 저장에 Redis를 활용해 한정판매 상품에 대규모 트래픽이 몰리더라도 빠른 재고 조회와 빠른 물품 구매를 지원하여, 고객의 불편을 최소화하고 만족도를 높여 고객이 원하는 것은 무엇이든지 구매할 수 있는 환경을 제공하고자 하였습니다.
 
-![Whatever-mall_Architecture.jpg](..%2F..%2FWhatever-mall_Architecture.jpg)
+![Whatever-mall_Architecture](https://github.com/user-attachments/assets/4062e07e-924b-4840-8c09-179db6b9b183)
 -----
 ## 💻주요 기능
 - MSA로 구성하여 장애 발생의 범위를 최소화 
