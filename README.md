@@ -16,9 +16,13 @@
 - Redis Cache를 이용해 대량의 트래픽 요청에도 빠른 응답 가능 
 - Redis Redisson을 활용한 동시성 제어
 - Scheduler를 활용하여 주문상태 주기적 관리 및 Redis Cache와 Database 동기화
+- Github Actions을 사용하여 CI/CD 구축 및 AWS ECS 배포
 -------------
 ## ⛓️ERD
 ![e-commerce](https://github.com/linxizhu1209/Whatever-mall/assets/146171215/c468a98f-3b26-441d-9706-b2f0d3202f9c)
+-----------
+## 🖌️ Architecture Diagram
+![Whatever-mall_Architecture.jpg](..%2F..%2FWhatever-mall_Architecture.jpg)
 -----------
 ## 📝API 문서 
 [Whatever-mall API (Postman)](https://documenter.getpostman.com/view/30411399/2sA3JT1xnA)
@@ -31,6 +35,8 @@
 - MySQL
 - Redis
 - Docker/Docker Compose
+- Github Actions CI/CD
+- AWS ECS, ECR
 
 ------
 ## 📈성능 최적화
@@ -48,6 +54,21 @@ Redis를 캐시 저장소로 사용함에따라, DB를 통한 재고를 조회�
 Apache Jmeter를 통해 대규모 트래픽 요청 테스트를 하여 성능테스트를 진행했습니다. 
 
 [성능 테스트 결과](https://blog.naver.com/dlahj1209/223455388573)
+
+---------
+
+## ⚡프로젝트 배포 과정 및 트러블 슈팅
+- AWS ECS를 사용하여 컨테이너 오케스트레이션 구현
+- Github Actions를 이용해 CI/CD 파이프라인 구축
+- AWS ECR에 Docker Image Push 후 ECS 배포
+- ECS 배포 후 Eureka 서비스 등록 문제 발생 및 해결
+
+전체 배포 과정 및 트러블 슈팅은 [블로그](https://blog.naver.com/dlahj1209/223515160465)에서 확인할 수 있습니다. 
+
+--------
+## 🎦 AWS ECS 배포 후 시연 영상
+https://youtu.be/be-Qq4-f2N8 
+<br>AWS ECS 환경에 프로젝트 배포 후 각 마이크로서비스의 일부 요청을 테스트한 영상입니다. 
 
 ---------------------
 **MADE BY** [임희주](https://github.com/linxizhu1209)
